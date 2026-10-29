@@ -1,0 +1,6 @@
+# Analysis environment: NumPy/MDAnalysis match recorded original runs.
+# Plotting versions are reproducibility targets, not recovered historical versions.
+numpy==2.2.6
+MDAnalysis==2.9.0
+scipy==1.15.3
+matplotlib==3.10.3

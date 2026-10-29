@@ -1,0 +1,26 @@
+parm dry.prmtop
+reference prod_dry.nc 1 1 [ref]
+trajin prod_dry.nc
+
+# Fit on Fc CH3 domains; everything else is measured in that frame
+rms CH3_fit  ref [ref] :109-212,322-425@CA,C,N out rmsd.dat
+rms Fc_CH2   ref [ref] :13-108,226-321@CA nofit out rmsd.dat
+rms CD16a    ref [ref] :426-596@CA nofit out rmsd.dat
+rms gly_Fc   ref [ref] :597-612&!@H= nofit out rmsd.dat
+rms gly_stub ref [ref] :613-614&!@H= nofit out rmsd.dat
+
+radgyr Rg :1-614 mass out rg.dat
+distance COM_Fc_CD16a :1-425,597-612 :426-596,613-614 out comdist.dat
+
+hbond HB_all :1-614 avgout hb_all_avg.dat
+
+molsurf SASA_cplx :1-614 out sasa.dat
+molsurf SASA_Fc   :1-425,597-612 out sasa.dat
+molsurf SASA_R    :426-596,613-614 out sasa.dat
+
+atomicfluct byres :1-614@CA out rmsf.dat
+
+# Self-fit RMSDs go last because they change the coordinates
+rms CD16a_self ref [ref] :426-596@CA out rmsd_self.dat
+rms Fc_self    ref [ref] :1-425@CA out rmsd_self.dat
+run

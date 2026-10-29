@@ -1,0 +1,21 @@
+parm dry.prmtop
+trajin prod_dry.nc
+pucker P597 :597@C1 :597@C2 :597@C3 :597@C4 :597@C5 :597@O5 cremer amplitude theta range360 out pucker.dat
+pucker P598 :598@C1 :598@C2 :598@C3 :598@C4 :598@C5 :598@O5 cremer amplitude theta range360 out pucker.dat
+pucker P599 :599@C1 :599@C2 :599@C3 :599@C4 :599@C5 :599@O5 cremer amplitude theta range360 out pucker.dat
+pucker P600 :600@C1 :600@C2 :600@C3 :600@C4 :600@C5 :600@O5 cremer amplitude theta range360 out pucker.dat
+pucker P601 :601@C1 :601@C2 :601@C3 :601@C4 :601@C5 :601@O5 cremer amplitude theta range360 out pucker.dat
+pucker P602 :602@C1 :602@C2 :602@C3 :602@C4 :602@C5 :602@O5 cremer amplitude theta range360 out pucker.dat
+pucker P603 :603@C1 :603@C2 :603@C3 :603@C4 :603@C5 :603@O5 cremer amplitude theta range360 out pucker.dat
+pucker P604 :604@C1 :604@C2 :604@C3 :604@C4 :604@C5 :604@O5 cremer amplitude theta range360 out pucker.dat
+pucker P605 :605@C1 :605@C2 :605@C3 :605@C4 :605@C5 :605@O5 cremer amplitude theta range360 out pucker.dat
+pucker P606 :606@C1 :606@C2 :606@C3 :606@C4 :606@C5 :606@O5 cremer amplitude theta range360 out pucker.dat
+pucker P607 :607@C1 :607@C2 :607@C3 :607@C4 :607@C5 :607@O5 cremer amplitude theta range360 out pucker.dat
+pucker P608 :608@C1 :608@C2 :608@C3 :608@C4 :608@C5 :608@O5 cremer amplitude theta range360 out pucker.dat
+pucker P609 :609@C1 :609@C2 :609@C3 :609@C4 :609@C5 :609@O5 cremer amplitude theta range360 out pucker.dat
+pucker P610 :610@C1 :610@C2 :610@C3 :610@C4 :610@C5 :610@O5 cremer amplitude theta range360 out pucker.dat
+pucker P611 :611@C1 :611@C2 :611@C3 :611@C4 :611@C5 :611@O5 cremer amplitude theta range360 out pucker.dat
+pucker P612 :612@C1 :612@C2 :612@C3 :612@C4 :612@C5 :612@O5 cremer amplitude theta range360 out pucker.dat
+pucker P613 :613@C1 :613@C2 :613@C3 :613@C4 :613@C5 :613@O5 cremer amplitude theta range360 out pucker.dat
+pucker P614 :614@C1 :614@C2 :614@C3 :614@C4 :614@C5 :614@O5 cremer amplitude theta range360 out pucker.dat
+run

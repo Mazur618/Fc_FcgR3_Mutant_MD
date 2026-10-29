@@ -1,0 +1,17 @@
+{
+  "description": "Fixed-trajectory structural and interface analysis; paths relative to this file",
+  "prep_root": "..",
+  "reference_pdb": "../WT.pdb",
+  "systems": ["WT", "D265A", "A327S", "S337A", "R255A", "S298A", "K334A", "E333A"],
+  "replicates": [1, 2, 3],
+  "start_frame": 301,
+  "end_frame": 1000,
+  "stride": 5,
+  "heavy_atom_contact_A": 4.5,
+  "salt_bridge_A": 4.0,
+  "display_min_mean_occupancy": 0.2,
+  "ch3_resids": [[109, 212], [322, 425]],
+  "ch2_resids": [[13, 108], [226, 321]],
+  "expected_protein_residue_counts": {"A": 212, "B": 213, "C": 171},
+  "expected_glycan_names": ["UYB", "4YB", "VMB", "2MA", "0YB", "2MA", "0YB", "0fA", "UYB", "4YB", "VMB", "2MA", "0YB", "2MA", "0YB", "0fA", "0YB", "0YB"]
+}

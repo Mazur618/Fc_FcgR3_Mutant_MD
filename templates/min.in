@@ -1,0 +1,12 @@
+Minimize ! job name (arbitrary)
+ &cntrl ! begin “control” namelist
+  imin=1, ! minimization on
+  ntx=1, ! 1=do not read velocities from inpcrd; 5=read them
+  ntxo=1, ! output format; 1=.rst7, 2=.nc
+  irest=0, ! restart; 0=no, 1=yes
+  maxcyc=5000, ! number of minimization steps/cycles
+  ncyc=2500, ! number of steps at which to switch to conjugate gradient
+  ntpr=250, ! how often to write mdout (log) file
+  ntwx=0, ! how often to write trajectory file (0=never)
+  cut=8.0, ! non-bonded cutoff in Å
+/ ! end “control” namelist

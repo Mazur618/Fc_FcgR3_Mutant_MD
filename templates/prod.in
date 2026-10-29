@@ -1,0 +1,10 @@
+Production WT
+&cntrl
+  imin=0, ntx=5, ntxo=1, irest=1,
+  nstlim=5000000, dt=0.002,
+  ntc=2, ntf=2, cut=8.0,
+  ntb=2, ntp=1, barostat=2, pres0=1.0, taup=2.0,
+  ntt=3, gamma_ln=1.0, temp0=310.15, ig=-1,
+  ntpr=5000, ntwx=5000, ntwr=500000, iwrap=1,
+  ntwprt=9883,
+/

@@ -1,0 +1,8 @@
+# name  spec(Fc = both heavy chains)  class
+D265A  Fc:265:ALA  reduced
+A327S  Fc:327:SER  reduced
+S337A  Fc:337:ALA  wtlike
+R255A  Fc:255:ALA  wtlike
+S298A  Fc:298:ALA  improved
+K334A  Fc:334:ALA  improved
+E333A  Fc:333:ALA  improved

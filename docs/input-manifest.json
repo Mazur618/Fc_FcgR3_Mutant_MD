@@ -1,0 +1,935 @@
+{
+  "schema_version": 1,
+  "source_root_description": "Fc_FcR3 directory containing prep and original WT tests",
+  "description": "Paths are destination paths; source paths are relative to the original study root. No trajectory contents were read to build this manifest.",
+  "entries": [
+    {
+      "path": "WT.pdb",
+      "source": "prep/WT.pdb",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 845808,
+      "sha256": "22504d588f9baee06a8cad39bc2317ac1ca866d011d120221e66c67029a57daf"
+    },
+    {
+      "path": "7URU.cif",
+      "source": "prep/7URU.cif",
+      "group": "preparation",
+      "exists": true,
+      "size_bytes": 989578,
+      "sha256": "86d3418ebb709f5766c53b8264505f44b5f258032e9599425424bdcdf1edfe39"
+    },
+    {
+      "path": "WT/rep1/dry.prmtop",
+      "source": "dry.WT.prmtop",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 4294572,
+      "sha256": "1c904acf261e7302082b76057bcd91d4410106eee862dab998eeaa6379f756dc"
+    },
+    {
+      "path": "WT/rep1/prod_dry.nc",
+      "source": "prod1_dry.nc",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 118648828,
+      "sha256": null,
+      "hash_note": "Not computed on login node; exporter hashes while copying."
+    },
+    {
+      "path": "WT/rep1/perframe.csv",
+      "source": "WT_perframe_s301.csv",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 104141,
+      "sha256": "a2543742e96c4036baddb1af74d73161073d984b41238084fada045736339690"
+    },
+    {
+      "path": "WT/rep2/dry.prmtop",
+      "source": "prep/WT/rep2/dry.prmtop",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 4294572,
+      "sha256": "4acec8e374bf831f70c6d8d1cc5ed35a13d294257dc74946f57414b41b1138e2"
+    },
+    {
+      "path": "WT/rep2/prod_dry.nc",
+      "source": "prep/WT/rep2/prod_dry.nc",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 118648828,
+      "sha256": null,
+      "hash_note": "Not computed on login node; exporter hashes while copying."
+    },
+    {
+      "path": "WT/rep2/perframe.csv",
+      "source": "prep/WT/rep2/perframe.csv",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 104359,
+      "sha256": "dbfaf90387b0aca776cf97cc8ffa1226fb7f68291b747b827eced233f8e5b929"
+    },
+    {
+      "path": "WT/rep3/dry.prmtop",
+      "source": "prep/WT/rep3/dry.prmtop",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 4294572,
+      "sha256": "4acec8e374bf831f70c6d8d1cc5ed35a13d294257dc74946f57414b41b1138e2"
+    },
+    {
+      "path": "WT/rep3/prod_dry.nc",
+      "source": "prep/WT/rep3/prod_dry.nc",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 118648828,
+      "sha256": null,
+      "hash_note": "Not computed on login node; exporter hashes while copying."
+    },
+    {
+      "path": "WT/rep3/perframe.csv",
+      "source": "prep/WT/rep3/perframe.csv",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 104853,
+      "sha256": "c9f2c9c6d78cd8be4e4f7170f165c60e80f0410f172d544fc886b05d65728c8c"
+    },
+    {
+      "path": "simulation_inputs/WT.prmtop",
+      "source": "prep/WT.prmtop",
+      "group": "simulation",
+      "exists": true,
+      "size_bytes": 23409220,
+      "sha256": "4c897d90af3cabbfab866cc8fcf6a1476a29daafb3ea5db28362c3ae692a7bd7"
+    },
+    {
+      "path": "simulation_inputs/WT.rst7",
+      "source": "prep/WT.rst7",
+      "group": "simulation",
+      "exists": true,
+      "size_bytes": 4716733,
+      "sha256": "7a7e1e4ae4f768e4c240f1450657f21c929ec10daf2a67d1a734085ba5d75596"
+    },
+    {
+      "path": "simulation_inputs/WT.ntwprt",
+      "source": "prep/WT.ntwprt",
+      "group": "simulation",
+      "exists": true,
+      "size_bytes": 5,
+      "sha256": "3b278abe6808bf0d528a5d693855f64c8917ab0fe6872620c7b5021d221ba8df"
+    },
+    {
+      "path": "simulation_inputs/WT_glycam.pdb",
+      "source": "prep/WT_glycam.pdb",
+      "group": "simulation",
+      "exists": true,
+      "size_bytes": 395325,
+      "sha256": "e9fd09c39c39450566a3f232e895ec9f104f74c5ca2af16d5e25da521a33a51f"
+    },
+    {
+      "path": "D265A/rep1/dry.prmtop",
+      "source": "prep/D265A/rep1/dry.prmtop",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 4292072,
+      "sha256": "f465b2fce4d6a5c379d0653c24ee70368a16670e09ec545e073a25fd4b9a3cbe"
+    },
+    {
+      "path": "D265A/rep1/prod_dry.nc",
+      "source": "prep/D265A/rep1/prod_dry.nc",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 118600828,
+      "sha256": null,
+      "hash_note": "Not computed on login node; exporter hashes while copying."
+    },
+    {
+      "path": "D265A/rep1/perframe.csv",
+      "source": "prep/D265A/rep1/perframe.csv",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 104815,
+      "sha256": "9bd50c3f8b011ab75cc824b5dc63788a174ce920308660ea480f6f72ef2867d3"
+    },
+    {
+      "path": "D265A/rep2/dry.prmtop",
+      "source": "prep/D265A/rep2/dry.prmtop",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 4292072,
+      "sha256": "f465b2fce4d6a5c379d0653c24ee70368a16670e09ec545e073a25fd4b9a3cbe"
+    },
+    {
+      "path": "D265A/rep2/prod_dry.nc",
+      "source": "prep/D265A/rep2/prod_dry.nc",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 118600828,
+      "sha256": null,
+      "hash_note": "Not computed on login node; exporter hashes while copying."
+    },
+    {
+      "path": "D265A/rep2/perframe.csv",
+      "source": "prep/D265A/rep2/perframe.csv",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 104786,
+      "sha256": "1cc15fb4ffac0a0b73e75f33bf9cdbeb07a387c9a9404e8dcd5985411ddf07d8"
+    },
+    {
+      "path": "D265A/rep3/dry.prmtop",
+      "source": "prep/D265A/rep3/dry.prmtop",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 4292072,
+      "sha256": "f465b2fce4d6a5c379d0653c24ee70368a16670e09ec545e073a25fd4b9a3cbe"
+    },
+    {
+      "path": "D265A/rep3/prod_dry.nc",
+      "source": "prep/D265A/rep3/prod_dry.nc",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 118600828,
+      "sha256": null,
+      "hash_note": "Not computed on login node; exporter hashes while copying."
+    },
+    {
+      "path": "D265A/rep3/perframe.csv",
+      "source": "prep/D265A/rep3/perframe.csv",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 104340,
+      "sha256": "770ade2c0a5f4ce46c5d09e2e5ee0755fa563a0b08c96ec1175eb2fd80cef72b"
+    },
+    {
+      "path": "simulation_inputs/D265A.prmtop",
+      "source": "prep/D265A.prmtop",
+      "group": "simulation",
+      "exists": true,
+      "size_bytes": 23407389,
+      "sha256": "8cac13b791751edb26825cf8ed4bebb2d609d2d452a3633a21e165107ddebe9e"
+    },
+    {
+      "path": "simulation_inputs/D265A.rst7",
+      "source": "prep/D265A.rst7",
+      "group": "simulation",
+      "exists": true,
+      "size_bytes": 4716733,
+      "sha256": "e4938c726c5eeb8b1b4fde0fabd37336bbef8ce06f0cc233662ee97406b7518e"
+    },
+    {
+      "path": "simulation_inputs/D265A.ntwprt",
+      "source": "prep/D265A.ntwprt",
+      "group": "simulation",
+      "exists": true,
+      "size_bytes": 5,
+      "sha256": "bf247b590766116d510765feb678fe9cbe6bb5b3b454b6d7d0dfcd3a5c916e3f"
+    },
+    {
+      "path": "simulation_inputs/D265A_glycam.pdb",
+      "source": "prep/D265A_glycam.pdb",
+      "group": "simulation",
+      "exists": true,
+      "size_bytes": 394851,
+      "sha256": "7f46b19c9586869bf4bbb74b283fd6047bcc3f3bd6ba41a6ff2739213ef0cd44"
+    },
+    {
+      "path": "simulation_inputs/D265A_protein.pdb",
+      "source": "prep/D265A_protein.pdb",
+      "group": "simulation",
+      "exists": true,
+      "size_bytes": 845528,
+      "sha256": "0ad947ba5beef9e7c7463e1bb4ed2ae4ba93f6bbf2122b01051733a5bec1ce02"
+    },
+    {
+      "path": "A327S/rep1/dry.prmtop",
+      "source": "prep/A327S/rep1/dry.prmtop",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 4296067,
+      "sha256": "a7d10a00d112b3f678da8cc1355c2645903c4e084c826f63ae39186d54f658b3"
+    },
+    {
+      "path": "A327S/rep1/prod_dry.nc",
+      "source": "prep/A327S/rep1/prod_dry.nc",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 118672828,
+      "sha256": null,
+      "hash_note": "Not computed on login node; exporter hashes while copying."
+    },
+    {
+      "path": "A327S/rep1/perframe.csv",
+      "source": "prep/A327S/rep1/perframe.csv",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 104502,
+      "sha256": "e777976635a2ac1bbf060c0bc478f9a54b1c071022cce263736e9979d906a547"
+    },
+    {
+      "path": "A327S/rep2/dry.prmtop",
+      "source": "prep/A327S/rep2/dry.prmtop",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 4296067,
+      "sha256": "a7d10a00d112b3f678da8cc1355c2645903c4e084c826f63ae39186d54f658b3"
+    },
+    {
+      "path": "A327S/rep2/prod_dry.nc",
+      "source": "prep/A327S/rep2/prod_dry.nc",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 118672828,
+      "sha256": null,
+      "hash_note": "Not computed on login node; exporter hashes while copying."
+    },
+    {
+      "path": "A327S/rep2/perframe.csv",
+      "source": "prep/A327S/rep2/perframe.csv",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 104490,
+      "sha256": "ee8ebe6bbdf7b1254f548cc68d4d8309cc96dd686ecb303dc8a17ad2881fcf8c"
+    },
+    {
+      "path": "A327S/rep3/dry.prmtop",
+      "source": "prep/A327S/rep3/dry.prmtop",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 4296067,
+      "sha256": "a7d10a00d112b3f678da8cc1355c2645903c4e084c826f63ae39186d54f658b3"
+    },
+    {
+      "path": "A327S/rep3/prod_dry.nc",
+      "source": "prep/A327S/rep3/prod_dry.nc",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 118672828,
+      "sha256": null,
+      "hash_note": "Not computed on login node; exporter hashes while copying."
+    },
+    {
+      "path": "A327S/rep3/perframe.csv",
+      "source": "prep/A327S/rep3/perframe.csv",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 103758,
+      "sha256": "3bcc083964213a3f5c0055b69d2739136d55e71ff57dacf1964191511ca1e470"
+    },
+    {
+      "path": "simulation_inputs/A327S.prmtop",
+      "source": "prep/A327S.prmtop",
+      "group": "simulation",
+      "exists": true,
+      "size_bytes": 23410715,
+      "sha256": "8106548a1f091c2322c65daf1681dc97dc3338e74a18b93016c3e73f941db938"
+    },
+    {
+      "path": "simulation_inputs/A327S.rst7",
+      "source": "prep/A327S.rst7",
+      "group": "simulation",
+      "exists": true,
+      "size_bytes": 4716806,
+      "sha256": "1d968fc7fe6d3f8d135380e04344198d86a7a291012afd439c2e52794f326c35"
+    },
+    {
+      "path": "simulation_inputs/A327S.ntwprt",
+      "source": "prep/A327S.ntwprt",
+      "group": "simulation",
+      "exists": true,
+      "size_bytes": 5,
+      "sha256": "bcb19c1690cbb5c92657169be4e9655572e3dc82ab80942c6f803dfd41a30f64"
+    },
+    {
+      "path": "simulation_inputs/A327S_glycam.pdb",
+      "source": "prep/A327S_glycam.pdb",
+      "group": "simulation",
+      "exists": true,
+      "size_bytes": 395483,
+      "sha256": "b5559acd107671c5c15c96920b304610f1cd548af69e8eacf9248f6547373209"
+    },
+    {
+      "path": "simulation_inputs/A327S_protein.pdb",
+      "source": "prep/A327S_protein.pdb",
+      "group": "simulation",
+      "exists": true,
+      "size_bytes": 846091,
+      "sha256": "6d3699768b3883133d12ab60e1ab03618e22c05f8592e420451fcfbc3c9fe1f7"
+    },
+    {
+      "path": "S337A/rep1/dry.prmtop",
+      "source": "prep/S337A/rep1/dry.prmtop",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 4293076,
+      "sha256": "2ba378cabab5c169614b04609b3b93c4cf5814672a5ee3d3a1db6d85e5773c9c"
+    },
+    {
+      "path": "S337A/rep1/prod_dry.nc",
+      "source": "prep/S337A/rep1/prod_dry.nc",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 118624828,
+      "sha256": null,
+      "hash_note": "Not computed on login node; exporter hashes while copying."
+    },
+    {
+      "path": "S337A/rep1/perframe.csv",
+      "source": "prep/S337A/rep1/perframe.csv",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 104320,
+      "sha256": "231eba7b4891f5f0794991ce5944cbc52e2c012ceac3f9c885960ef35f4233e3"
+    },
+    {
+      "path": "S337A/rep2/dry.prmtop",
+      "source": "prep/S337A/rep2/dry.prmtop",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 4293076,
+      "sha256": "2ba378cabab5c169614b04609b3b93c4cf5814672a5ee3d3a1db6d85e5773c9c"
+    },
+    {
+      "path": "S337A/rep2/prod_dry.nc",
+      "source": "prep/S337A/rep2/prod_dry.nc",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 118624828,
+      "sha256": null,
+      "hash_note": "Not computed on login node; exporter hashes while copying."
+    },
+    {
+      "path": "S337A/rep2/perframe.csv",
+      "source": "prep/S337A/rep2/perframe.csv",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 104049,
+      "sha256": "09b00cad17db57facad77612bb7ca19d0b94eb4d55493e204cf8ec527deb3453"
+    },
+    {
+      "path": "S337A/rep3/dry.prmtop",
+      "source": "prep/S337A/rep3/dry.prmtop",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 4293076,
+      "sha256": "2ba378cabab5c169614b04609b3b93c4cf5814672a5ee3d3a1db6d85e5773c9c"
+    },
+    {
+      "path": "S337A/rep3/prod_dry.nc",
+      "source": "prep/S337A/rep3/prod_dry.nc",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 118624828,
+      "sha256": null,
+      "hash_note": "Not computed on login node; exporter hashes while copying."
+    },
+    {
+      "path": "S337A/rep3/perframe.csv",
+      "source": "prep/S337A/rep3/perframe.csv",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 104420,
+      "sha256": "ca4ae45a7f9fe7e2ba7f5f0c67f93c528d82791c7ba4f9ba811c03490d893f8d"
+    },
+    {
+      "path": "simulation_inputs/S337A.prmtop",
+      "source": "prep/S337A.prmtop",
+      "group": "simulation",
+      "exists": true,
+      "size_bytes": 23408196,
+      "sha256": "7a0378011b89901e51e5487674f15d7b400194f99a5ca767a5215c583716b676"
+    },
+    {
+      "path": "simulation_inputs/S337A.rst7",
+      "source": "prep/S337A.rst7",
+      "group": "simulation",
+      "exists": true,
+      "size_bytes": 4716769,
+      "sha256": "7385ca2c2e531ff6bfa8535ac2f072fa8b43979a494d39abfa4bb746ab0d18a6"
+    },
+    {
+      "path": "simulation_inputs/S337A.ntwprt",
+      "source": "prep/S337A.ntwprt",
+      "group": "simulation",
+      "exists": true,
+      "size_bytes": 5,
+      "sha256": "44769d980389109bd29653a548c679f80222fd6b1b3280ed7c481e6f401084f4"
+    },
+    {
+      "path": "simulation_inputs/S337A_glycam.pdb",
+      "source": "prep/S337A_glycam.pdb",
+      "group": "simulation",
+      "exists": true,
+      "size_bytes": 395167,
+      "sha256": "41061a4a1cbd1409d2bb0e4fa7ebff54c03de92c7907823b43f9fb4da17e233b"
+    },
+    {
+      "path": "simulation_inputs/S337A_protein.pdb",
+      "source": "prep/S337A_protein.pdb",
+      "group": "simulation",
+      "exists": true,
+      "size_bytes": 845686,
+      "sha256": "f8834d01d2e91ef04c4847bc56578319ed49aacefd5f0b8931d06989d6f6d606"
+    },
+    {
+      "path": "R255A/rep1/dry.prmtop",
+      "source": "prep/R255A/rep1/dry.prmtop",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 4283375,
+      "sha256": "b285a0b830f5bb1f2a9403b943007766f29e6ca52e7dc7ddd0bca04be5ba7cda"
+    },
+    {
+      "path": "R255A/rep1/prod_dry.nc",
+      "source": "prep/R255A/rep1/prod_dry.nc",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 118312828,
+      "sha256": null,
+      "hash_note": "Not computed on login node; exporter hashes while copying."
+    },
+    {
+      "path": "R255A/rep1/perframe.csv",
+      "source": "prep/R255A/rep1/perframe.csv",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 104125,
+      "sha256": "849476980d94283f3d7fc3ccd2cf8312d2f611e91335e39863f34f3b8c2e40d9"
+    },
+    {
+      "path": "R255A/rep2/dry.prmtop",
+      "source": "prep/R255A/rep2/dry.prmtop",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 4283375,
+      "sha256": "b285a0b830f5bb1f2a9403b943007766f29e6ca52e7dc7ddd0bca04be5ba7cda"
+    },
+    {
+      "path": "R255A/rep2/prod_dry.nc",
+      "source": "prep/R255A/rep2/prod_dry.nc",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 118312828,
+      "sha256": null,
+      "hash_note": "Not computed on login node; exporter hashes while copying."
+    },
+    {
+      "path": "R255A/rep2/perframe.csv",
+      "source": "prep/R255A/rep2/perframe.csv",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 104965,
+      "sha256": "463737fd7173475a00052f0b987af062e6be9fbf7bc3c72cb29e2adef7049a9a"
+    },
+    {
+      "path": "R255A/rep3/dry.prmtop",
+      "source": "prep/R255A/rep3/dry.prmtop",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 4283375,
+      "sha256": "b285a0b830f5bb1f2a9403b943007766f29e6ca52e7dc7ddd0bca04be5ba7cda"
+    },
+    {
+      "path": "R255A/rep3/prod_dry.nc",
+      "source": "prep/R255A/rep3/prod_dry.nc",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 118312828,
+      "sha256": null,
+      "hash_note": "Not computed on login node; exporter hashes while copying."
+    },
+    {
+      "path": "R255A/rep3/perframe.csv",
+      "source": "prep/R255A/rep3/perframe.csv",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 104420,
+      "sha256": "e7c97e46219c742722b020ffa23316cd577fe1d028d5f8175905a49698115195"
+    },
+    {
+      "path": "simulation_inputs/R255A.prmtop",
+      "source": "prep/R255A.prmtop",
+      "group": "simulation",
+      "exists": true,
+      "size_bytes": 23407872,
+      "sha256": "6213221e34dc6fb8880ccbc64f4f789a75dcdd471b696587fb7398e7e2d40a0f"
+    },
+    {
+      "path": "simulation_inputs/R255A.rst7",
+      "source": "prep/R255A.rst7",
+      "group": "simulation",
+      "exists": true,
+      "size_bytes": 4717974,
+      "sha256": "6c8b8a9f9091792dec5dd14c07adc6bdf9a979373f5ba7486a1ac1d986e9d423"
+    },
+    {
+      "path": "simulation_inputs/R255A.ntwprt",
+      "source": "prep/R255A.ntwprt",
+      "group": "simulation",
+      "exists": true,
+      "size_bytes": 5,
+      "sha256": "3d5602c3a994fd3adfb29c332b50bfcc2ad59607f6edb4f3b039777653290613"
+    },
+    {
+      "path": "simulation_inputs/R255A_glycam.pdb",
+      "source": "prep/R255A_glycam.pdb",
+      "group": "simulation",
+      "exists": true,
+      "size_bytes": 394377,
+      "sha256": "ba81345198f72e4fb2060636f1e6e7cc85794330b9dd525a5767c5e77649e4ad"
+    },
+    {
+      "path": "simulation_inputs/R255A_protein.pdb",
+      "source": "prep/R255A_protein.pdb",
+      "group": "simulation",
+      "exists": true,
+      "size_bytes": 843553,
+      "sha256": "9f4be0763326daec0a5ac23706cd867d5c7d2f8d09a3accf7159f768ce807617"
+    },
+    {
+      "path": "S298A/rep1/dry.prmtop",
+      "source": "prep/S298A/rep1/dry.prmtop",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 4293076,
+      "sha256": "6e461f835698e918fbc9f85f2556e0debaf994ca6360d6cab13985a20021da3c"
+    },
+    {
+      "path": "S298A/rep1/prod_dry.nc",
+      "source": "prep/S298A/rep1/prod_dry.nc",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 118624828,
+      "sha256": null,
+      "hash_note": "Not computed on login node; exporter hashes while copying."
+    },
+    {
+      "path": "S298A/rep1/perframe.csv",
+      "source": "prep/S298A/rep1/perframe.csv",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 104273,
+      "sha256": "1e7a5d39f756050922ffac3cf2beea2aeac63847fe9d5453c4e522d516fdc386"
+    },
+    {
+      "path": "S298A/rep2/dry.prmtop",
+      "source": "prep/S298A/rep2/dry.prmtop",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 4293076,
+      "sha256": "6e461f835698e918fbc9f85f2556e0debaf994ca6360d6cab13985a20021da3c"
+    },
+    {
+      "path": "S298A/rep2/prod_dry.nc",
+      "source": "prep/S298A/rep2/prod_dry.nc",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 118624828,
+      "sha256": null,
+      "hash_note": "Not computed on login node; exporter hashes while copying."
+    },
+    {
+      "path": "S298A/rep2/perframe.csv",
+      "source": "prep/S298A/rep2/perframe.csv",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 104259,
+      "sha256": "b512e3fdb11917631fd2f354f16a9687162431f688059c7cf0d05ffabfcc5ca0"
+    },
+    {
+      "path": "S298A/rep3/dry.prmtop",
+      "source": "prep/S298A/rep3/dry.prmtop",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 4293076,
+      "sha256": "6e461f835698e918fbc9f85f2556e0debaf994ca6360d6cab13985a20021da3c"
+    },
+    {
+      "path": "S298A/rep3/prod_dry.nc",
+      "source": "prep/S298A/rep3/prod_dry.nc",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 118624828,
+      "sha256": null,
+      "hash_note": "Not computed on login node; exporter hashes while copying."
+    },
+    {
+      "path": "S298A/rep3/perframe.csv",
+      "source": "prep/S298A/rep3/perframe.csv",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 103973,
+      "sha256": "c89b6217bc15643ca54dfa6715707bbac0837367ffd60cae61eb95a8e7add583"
+    },
+    {
+      "path": "simulation_inputs/S298A.prmtop",
+      "source": "prep/S298A.prmtop",
+      "group": "simulation",
+      "exists": true,
+      "size_bytes": 23407724,
+      "sha256": "86d6a5b36933fd277c81af3852bda5327c5fcfb83e4ba6c0876f2550314bbcaf"
+    },
+    {
+      "path": "simulation_inputs/S298A.rst7",
+      "source": "prep/S298A.rst7",
+      "group": "simulation",
+      "exists": true,
+      "size_bytes": 4716660,
+      "sha256": "5486f5b0273a036e304b4b2b1758589f6d3018c4cd12d18d9e26cd96bcda4f51"
+    },
+    {
+      "path": "simulation_inputs/S298A.ntwprt",
+      "source": "prep/S298A.ntwprt",
+      "group": "simulation",
+      "exists": true,
+      "size_bytes": 5,
+      "sha256": "44769d980389109bd29653a548c679f80222fd6b1b3280ed7c481e6f401084f4"
+    },
+    {
+      "path": "simulation_inputs/S298A_glycam.pdb",
+      "source": "prep/S298A_glycam.pdb",
+      "group": "simulation",
+      "exists": true,
+      "size_bytes": 395167,
+      "sha256": "61f153b73c6cf77432b26fce3cce634d5cb1fce88b501e5e8e3b5f07a2e191e2"
+    },
+    {
+      "path": "simulation_inputs/S298A_protein.pdb",
+      "source": "prep/S298A_protein.pdb",
+      "group": "simulation",
+      "exists": true,
+      "size_bytes": 845686,
+      "sha256": "fbc9b8be3d2be4fab5a0165a1c99901464c8054daae7ae66f0a2fd6c625dd217"
+    },
+    {
+      "path": "K334A/rep1/dry.prmtop",
+      "source": "prep/K334A/rep1/dry.prmtop",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 4285187,
+      "sha256": "de662b4e1ec10d0b2dbeaccb1ae0ecc67973cd4f655bbf4e1ad19b5dcf878133"
+    },
+    {
+      "path": "K334A/rep1/prod_dry.nc",
+      "source": "prep/K334A/rep1/prod_dry.nc",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 118360828,
+      "sha256": null,
+      "hash_note": "Not computed on login node; exporter hashes while copying."
+    },
+    {
+      "path": "K334A/rep1/perframe.csv",
+      "source": "prep/K334A/rep1/perframe.csv",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 104476,
+      "sha256": "6c89bc2fbbd0010bfc8e462e12f4668924b910e79369588c0eb0316f15cee719"
+    },
+    {
+      "path": "K334A/rep2/dry.prmtop",
+      "source": "prep/K334A/rep2/dry.prmtop",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 4285187,
+      "sha256": "de662b4e1ec10d0b2dbeaccb1ae0ecc67973cd4f655bbf4e1ad19b5dcf878133"
+    },
+    {
+      "path": "K334A/rep2/prod_dry.nc",
+      "source": "prep/K334A/rep2/prod_dry.nc",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 118360828,
+      "sha256": null,
+      "hash_note": "Not computed on login node; exporter hashes while copying."
+    },
+    {
+      "path": "K334A/rep2/perframe.csv",
+      "source": "prep/K334A/rep2/perframe.csv",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 103997,
+      "sha256": "83342980ddbb7d220f00aee7b746bfb97d35cac40513bc14dd698b33bf5c2ba3"
+    },
+    {
+      "path": "K334A/rep3/dry.prmtop",
+      "source": "prep/K334A/rep3/dry.prmtop",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 4285187,
+      "sha256": "de662b4e1ec10d0b2dbeaccb1ae0ecc67973cd4f655bbf4e1ad19b5dcf878133"
+    },
+    {
+      "path": "K334A/rep3/prod_dry.nc",
+      "source": "prep/K334A/rep3/prod_dry.nc",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 118360828,
+      "sha256": null,
+      "hash_note": "Not computed on login node; exporter hashes while copying."
+    },
+    {
+      "path": "K334A/rep3/perframe.csv",
+      "source": "prep/K334A/rep3/perframe.csv",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 104099,
+      "sha256": "ca3365a69282df5c00e61951ca74f023409bfdf0fe0cf7774d88502c7893d03a"
+    },
+    {
+      "path": "simulation_inputs/K334A.prmtop",
+      "source": "prep/K334A.prmtop",
+      "group": "simulation",
+      "exists": true,
+      "size_bytes": 23398697,
+      "sha256": "d1b89da5494fdff9cdcef83770308de3dc33f1a639282b377faf795af1dd92f9"
+    },
+    {
+      "path": "simulation_inputs/K334A.rst7",
+      "source": "prep/K334A.rst7",
+      "group": "simulation",
+      "exists": true,
+      "size_bytes": 4715601,
+      "sha256": "f942adf4afbaefde223898bc3353627c7955b36062d7fc416c346ff561f6c1fc"
+    },
+    {
+      "path": "simulation_inputs/K334A.ntwprt",
+      "source": "prep/K334A.ntwprt",
+      "group": "simulation",
+      "exists": true,
+      "size_bytes": 5,
+      "sha256": "562d06fa904e75f7f57675031f03e1c622491374d918373a1a4dc8b1892dc084"
+    },
+    {
+      "path": "simulation_inputs/K334A_glycam.pdb",
+      "source": "prep/K334A_glycam.pdb",
+      "group": "simulation",
+      "exists": true,
+      "size_bytes": 394693,
+      "sha256": "50b19ec74542bb03b2449c3fd7760a3f86cb02b99d9b916a8a335407d507befe"
+    },
+    {
+      "path": "simulation_inputs/K334A_protein.pdb",
+      "source": "prep/K334A_protein.pdb",
+      "group": "simulation",
+      "exists": true,
+      "size_bytes": 843915,
+      "sha256": "74931bec96bbf246cc3753abfb2f9bcebde8f5f0d8c563f233b516d89517ece8"
+    },
+    {
+      "path": "E333A/rep1/dry.prmtop",
+      "source": "prep/E333A/rep1/dry.prmtop",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 4289897,
+      "sha256": "0d5e92c6d1bbe535147d3d54899975ff8b0aeb56aea165e78f25774453dbb4f8"
+    },
+    {
+      "path": "E333A/rep1/prod_dry.nc",
+      "source": "prep/E333A/rep1/prod_dry.nc",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 118528828,
+      "sha256": null,
+      "hash_note": "Not computed on login node; exporter hashes while copying."
+    },
+    {
+      "path": "E333A/rep1/perframe.csv",
+      "source": "prep/E333A/rep1/perframe.csv",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 104275,
+      "sha256": "2999abf9be1a12130755b55e0f5de9b5c16fb9552d804cfff27a83b86bd05c3e"
+    },
+    {
+      "path": "E333A/rep2/dry.prmtop",
+      "source": "prep/E333A/rep2/dry.prmtop",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 4289897,
+      "sha256": "0d5e92c6d1bbe535147d3d54899975ff8b0aeb56aea165e78f25774453dbb4f8"
+    },
+    {
+      "path": "E333A/rep2/prod_dry.nc",
+      "source": "prep/E333A/rep2/prod_dry.nc",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 118528828,
+      "sha256": null,
+      "hash_note": "Not computed on login node; exporter hashes while copying."
+    },
+    {
+      "path": "E333A/rep2/perframe.csv",
+      "source": "prep/E333A/rep2/perframe.csv",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 104489,
+      "sha256": "59aa929aeb93e357070653b2ffc37cf8efc79d4e2302ecd372dcb65bd713d662"
+    },
+    {
+      "path": "E333A/rep3/dry.prmtop",
+      "source": "prep/E333A/rep3/dry.prmtop",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 4289897,
+      "sha256": "0d5e92c6d1bbe535147d3d54899975ff8b0aeb56aea165e78f25774453dbb4f8"
+    },
+    {
+      "path": "E333A/rep3/prod_dry.nc",
+      "source": "prep/E333A/rep3/prod_dry.nc",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 118528828,
+      "sha256": null,
+      "hash_note": "Not computed on login node; exporter hashes while copying."
+    },
+    {
+      "path": "E333A/rep3/perframe.csv",
+      "source": "prep/E333A/rep3/perframe.csv",
+      "group": "analysis",
+      "exists": true,
+      "size_bytes": 104664,
+      "sha256": "cd0540de25686bcd0d6c49c56fbbe5679b39d78bcc2b2afba5aff22a5a8033e0"
+    },
+    {
+      "path": "simulation_inputs/E333A.prmtop",
+      "source": "prep/E333A.prmtop",
+      "group": "simulation",
+      "exists": true,
+      "size_bytes": 23401862,
+      "sha256": "012bc7790fc19a5faca228a92a57f05837fbdef0ab52b643e11a751a013de235"
+    },
+    {
+      "path": "simulation_inputs/E333A.rst7",
+      "source": "prep/E333A.rst7",
+      "group": "simulation",
+      "exists": true,
+      "size_bytes": 4715747,
+      "sha256": "85502121d2ff49baf3dc98bd8cd16b94f26e8b0b84ee8ede67f717e77aa001c0"
+    },
+    {
+      "path": "simulation_inputs/E333A.ntwprt",
+      "source": "prep/E333A.ntwprt",
+      "group": "simulation",
+      "exists": true,
+      "size_bytes": 5,
+      "sha256": "ed312cb798c73d5ef040fb336fb4e802a43a2f6771ae9a0109c2727bea362bad"
+    },
+    {
+      "path": "simulation_inputs/E333A_glycam.pdb",
+      "source": "prep/E333A_glycam.pdb",
+      "group": "simulation",
+      "exists": true,
+      "size_bytes": 394693,
+      "sha256": "6aacce1525f5b158d8b67eac815e3c7c290a0032b06160225de2a032933b5337"
+    },
+    {
+      "path": "simulation_inputs/E333A_protein.pdb",
+      "source": "prep/E333A_protein.pdb",
+      "group": "simulation",
+      "exists": true,
+      "size_bytes": 845045,
+      "sha256": "8e673c1379feb3e0190edf898cd6236140018ca306dc3bb35df26891a9ca8031"
+    }
+  ]
+}
