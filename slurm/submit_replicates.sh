@@ -1,5 +1,5 @@
 #!/bin/bash
-# usage: bash simulation/submit_replicates.sh NAME REP_FIRST REP_LAST      e.g. bash simulation/submit_replicates.sh D265A 1 3
+# usage: bash slurm/submit_replicates.sh NAME REP_FIRST REP_LAST      e.g. bash slurm/submit_replicates.sh D265A 1 3
 # Needs MD/<stage>.in for each stage (copy your WT inputs there).
 # Each replicate: min -> heat -> eq1 -> eq2 -> prod (dependent GPU jobs) -> post (CPU job).
 NAME=$1; R1=${2:-1}; R2=${3:-1}
@@ -61,7 +61,7 @@ SB
 #SBATCH --mail-type=FAIL
 
 cd $ROOT
-bash simulation/run_mmgbsa.sh $NAME $R
+bash analysis/mmgbsa/run_mmgbsa.sh $NAME $R
 SB
   JID=$(sbatch --parsable --dependency=afterok:$DEP $D/post.sbatch)
   echo "$NAME rep$R post -> job $JID"

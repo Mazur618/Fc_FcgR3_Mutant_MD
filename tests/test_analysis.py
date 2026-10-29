@@ -9,9 +9,9 @@ import tempfile
 import time
 import unittest
 
-from analysis.trajectory import input_records, kabsch_fit, pair_counts, read_protocol, residue_map, write_csv
-from analysis.plot_structure import load_runs
-from analysis.plot_binding import load_energy
+from analysis.structure.trajectory import input_records, kabsch_fit, pair_counts, read_protocol, residue_map, write_csv
+from analysis.structure.plot_structure import load_runs
+from analysis.mmgbsa.plot_binding import load_energy
 from analysis.sensitivity import conditions, frame_selected, minimum_pairs
 
 
@@ -151,8 +151,8 @@ class ProtocolTests(unittest.TestCase):
 
 class PortabilityTests(unittest.TestCase):
     def test_package_commands_show_help_without_analysis_dependencies(self):
-        for module in ('trajectory', 'plot_structure', 'plot_binding',
-                       'sensitivity', 'build_report'):
+        for module in ('structure.trajectory', 'structure.plot_structure', 'mmgbsa.plot_binding',
+                       'sensitivity', 'reporting.build_report'):
             with self.subTest(module=module):
                 result = subprocess.run(
                     [sys.executable, '-B', '-m', 'analysis.' + module, '--help'],
@@ -168,7 +168,7 @@ class PortabilityTests(unittest.TestCase):
             (source / 'data').mkdir()
             (source / 'reference.pdb').touch()
             protocol = source / 'configured.json'
-            command = [sys.executable, str(HERE.parent / 'slurm/configure_protocol.py'),
+            command = [sys.executable, str(HERE.parent / 'preprocessing/configure_protocol.py'),
                        '--data-root', str(source / 'data'),
                        '--reference', str(source / 'reference.pdb'), '--out', str(protocol)]
             subprocess.run(command, check=True, capture_output=True, text=True)
@@ -183,7 +183,7 @@ class PortabilityTests(unittest.TestCase):
             self.assertIn('FileExistsError', refused.stderr)
 
     def test_dataset_export_materializes_files_and_hashes_trajectories(self):
-        spec = importlib.util.spec_from_file_location('export_inputs', HERE.parent / 'slurm/export_inputs.py')
+        spec = importlib.util.spec_from_file_location('export_inputs', HERE.parent / 'preprocessing/export_inputs.py')
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
         with SharedFilesystemTemporaryDirectory(dir=HERE) as d:
@@ -210,7 +210,7 @@ class PortabilityTests(unittest.TestCase):
                 module.selected_inputs(manifest, source, {'analysis'})
 
     def test_report_paths_do_not_assume_a_prep_parent(self):
-        from analysis.build_report import figure_catalog
+        from analysis.reporting.build_report import figure_catalog
         root = Path('renamed-repository')
         figures = figure_catalog(root)
         self.assertEqual(len(figures), 23)

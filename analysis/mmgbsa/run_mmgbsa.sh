@@ -1,5 +1,5 @@
 #!/bin/bash
-# usage: bash simulation/run_mmgbsa.sh NAME REP   (submitted automatically after prod)
+# usage: bash analysis/mmgbsa/run_mmgbsa.sh NAME REP   (submitted automatically after prod)
 # Image -> reorder atoms -> MM-GBSA topologies -> MMPBSA.py. Output: NAME/repN/FINAL.dat
 set -e
 NAME=$1; R=$2

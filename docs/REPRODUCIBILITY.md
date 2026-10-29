@@ -39,10 +39,10 @@ configured protocol, whose data/reference paths are relative to its own location
 
 ```bash
 mkdir -p work
-python slurm/configure_protocol.py \
+python preprocessing/configure_protocol.py \
   --data-root /path/to/data-root --reference /path/to/WT.pdb \
   --out work/protocol.json
-python -m analysis.trajectory --protocol work/protocol.json \
+python -m analysis.structure.trajectory --protocol work/protocol.json \
   inventory --out work/inventory.json
 ```
 
@@ -66,7 +66,7 @@ No setup command submits jobs.
 For one run inside an allocation:
 
 ```bash
-python -m analysis.trajectory --protocol work/protocol.json run \
+python -m analysis.structure.trajectory --protocol work/protocol.json run \
   --system WT --replicate 1 --out work/defined_results/WT/rep1
 ```
 
@@ -77,13 +77,13 @@ counts. Whole trajectories are not hashed by the analysis workflow.
 After all runs complete, use a suitable allocation for:
 
 ```bash
-python -m analysis.plot_structure work/defined_results/*/rep* \
+python -m analysis.structure.plot_structure work/defined_results/*/rep* \
   --out work/defined_figures_review
-python -m analysis.plot_binding work/defined_results/*/rep* \
+python -m analysis.mmgbsa.plot_binding work/defined_results/*/rep* \
   --out work/defined_binding_figures
 python -m analysis.sensitivity work/defined_results/*/rep* \
   --out work/sensitivity_results
-python -m analysis.build_report --project work \
+python -m analysis.reporting.build_report --project work \
   --out work/analysis_review --zip work/analysis_review.zip
 ```
 
@@ -110,7 +110,7 @@ submission referenced version 24). These are separate from the analysis-only
 environment; no recovered preparation environment lock is supplied.
 Supply the original prepared VAL158 `WT.pdb` and glycan source `7URU.cif`.
 Their preparation history, edits, protonation, and checksums must accompany a
-released dataset. `preparation/build_complex.py` does not create the receptor allotype by itself.
+released dataset. `preprocessing/build_complex.py` does not create the receptor allotype by itself.
 
 Load tools through your site environment, or export `AMBER_ENV` as the path to an
 Amber setup script. Leave it unset to use tools on PATH. GPU jobs need
@@ -121,7 +121,7 @@ your site and run preparation in an allocation.
 
 Build/postprocessing/submission scripts can overwrite generated outputs.
 Use a fresh working directory with copies of tracked source and supplied inputs;
-do not rerun them over existing results. `simulation/submit_all_variants.sh`, `simulation/submit_replicates.sh`, and
+do not rerun them over existing results. `slurm/submit_all_variants.sh`, `slurm/submit_replicates.sh`, and
 `legacy/queue_analysis.sh` submit jobs and require explicit review/authorization.
 They have not been run during repository setup.
 

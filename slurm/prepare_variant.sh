@@ -1,6 +1,6 @@
 #!/bin/bash
-# usage: bash preparation/prepare_variant.sh D265A Fc:265:ALA
-# Run in the PyRosetta env, in the folder with preparation/build_complex.py, WT.pdb, 7URU.cif.
+# usage: bash slurm/prepare_variant.sh D265A Fc:265:ALA
+# Run in the PyRosetta env, in the folder with preprocessing/build_complex.py, WT.pdb, 7URU.cif.
 set -e
 NAME=$1; SPEC=$2
 IFS=: read CH NUM AA3 <<< "$SPEC"
@@ -12,11 +12,11 @@ for c in A B; do
     echo "ERROR: chain $c residue $NUM is '$FOUND' in WT.pdb, expected $EXPECT from name $NAME"; exit 1
   fi
 done
-python preparation/build_complex.py --name $NAME --mut $SPEC | tee prep_$NAME.txt
-source "$(dirname "${BASH_SOURCE[0]}")/../slurm/amber_env.sh"
+python preprocessing/build_complex.py --name $NAME --mut $SPEC | tee prep_$NAME.txt
+source "$(dirname "${BASH_SOURCE[0]}")/amber_env.sh"
 tleap -f build_$NAME.in > build_$NAME.out
 tail -3 build_$NAME.out
 grep -q "Errors = 0" build_$NAME.out || { echo "tleap reported errors: see build_$NAME.out"; exit 1; }
 grep -E "ions required|Placed" build_$NAME.out | head
 ls -l $NAME.prmtop $NAME.rst7
-bash preparation/prepare_dry_topology.sh $NAME
+bash preprocessing/prepare_dry_topology.sh $NAME

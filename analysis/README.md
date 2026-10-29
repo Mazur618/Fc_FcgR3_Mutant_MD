@@ -89,7 +89,7 @@ From the repository root (the former `prep` folder), audit paths and mapping (li
 
 ```bash
 mkdir -p work
-python -m analysis.trajectory inventory --out work/input_inventory.json
+python -m analysis.structure.trajectory inventory --out work/input_inventory.json
 python -B -m unittest discover -s tests -p 'test_*.py' -v
 ```
 
@@ -99,7 +99,7 @@ Limit numerical libraries to one thread; see `slurm/analyze.slurm`.
 The Python command itself does not submit jobs:
 
 ```bash
-OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python -m analysis.trajectory run --system WT --replicate 1 --out defined_results/WT/rep1
+OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python -m analysis.structure.trajectory run --system WT --replicate 1 --out defined_results/WT/rep1
 ```
 
 Repeat for each configured system/replicate. The output directory must not
@@ -111,7 +111,7 @@ Once all runs are complete, produce tables and PNG/PDF figures (also requires
 Matplotlib):
 
 ```bash
-python -m analysis.plot_structure defined_results/*/rep* --out defined_figures
+python -m analysis.structure.plot_structure defined_results/*/rep* --out defined_figures
 ```
 
 No dependencies are installed automatically. Outputs refuse existing directories
@@ -126,7 +126,7 @@ separate direct-electrostatic/GB and net-component panels, and exploratory
 contact-count versus energy plots. Component bars show descriptive means.
 
 ```bash
-python -m analysis.plot_binding defined_results/*/rep* --out defined_binding_figures
+python -m analysis.mmgbsa.plot_binding defined_results/*/rep* --out defined_binding_figures
 ```
 
 Snapshot ordinals and counts are checked against structural results. Energy CSVs
@@ -166,7 +166,7 @@ resolve the limitations of short runs or fixed starting structures.
 ## Annotated offline image viewer
 
 ```bash
-python -m analysis.build_report --out analysis_review --zip analysis_review.zip
+python -m analysis.reporting.build_report --out analysis_review --zip analysis_review.zip
 ```
 
 The report has two pages: `index.html` condenses structural summaries, selected

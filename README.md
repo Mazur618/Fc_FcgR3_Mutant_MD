@@ -106,10 +106,12 @@ rather than on shared login nodes.
 | `analysis/` | Current structural/contact analysis, comparisons, sensitivity, offline report |
 | `tests/` | Synthetic workflow, numerical, and report tests |
 | `config/analysis_protocol.json` | Scientific settings and expected topology layout |
-| `slurm/` | Portable protocol writer, Amber environment helper, Slurm analysis template |
+| `slurm/` | Mutation tool, workflow automation, replicate submission, Slurm job templates |
 | `MD/` | Amber minimization, heating, equilibration, production inputs |
-| `preparation/` | Protein extraction/mutation, glycosylated complex construction, dry topology |
-| `simulation/` | Replicate submission and MM/GBSA postprocessing |
+| `preprocessing/` | Protein extraction, complex building, dry topology, input configuration/export |
+| `analysis/structure/` | Trajectory geometry, interface contacts, structural plots |
+| `analysis/mmgbsa/` | MM/GBSA postprocessing and binding-energy plots |
+| `analysis/reporting/` | Offline report generation |
 | `legacy/` | Archived exploration; definitions differ from `analysis`; reference copies only |
 | `report/` | Selected two-page results report with figure/PDF/CSV assets |
 | `docs/` | Reproduction and release notes |

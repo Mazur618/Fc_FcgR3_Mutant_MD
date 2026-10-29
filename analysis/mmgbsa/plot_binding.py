@@ -11,8 +11,8 @@ import hashlib
 import json
 from pathlib import Path
 
-from .io import write_csv
-from .plot_structure import load_runs
+from ..io import write_csv
+from ..structure.plot_structure import load_runs
 
 
 TERMS = ['VDWAALS', 'EEL', 'EGB', 'ESURF', 'DELTA TOTAL']

@@ -199,7 +199,7 @@ def build(project, out, archive=None):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--project', type=Path, default=Path(__file__).resolve().parents[1])
+    parser.add_argument('--project', type=Path, default=Path(__file__).resolve().parents[2])
     parser.add_argument('--out', type=Path, required=True)
     parser.add_argument('--zip', type=Path)
     args = parser.parse_args()

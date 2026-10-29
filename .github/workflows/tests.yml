@@ -16,6 +16,6 @@ jobs:
       - run: python -m pip install -r requirements-analysis.txt
       - run: python -B -m unittest discover -s tests -p 'test_*.py' -v
       - run: |
-          for script in preparation/*.sh simulation/*.sh slurm/*.sh slurm/*.slurm legacy/*.sh; do
+          for script in preprocessing/*.sh analysis/mmgbsa/*.sh slurm/*.sh slurm/*.slurm legacy/*.sh; do
             bash -n "$script"
           done

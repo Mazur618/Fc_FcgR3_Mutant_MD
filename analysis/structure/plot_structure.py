@@ -11,7 +11,7 @@ import json
 import math
 from pathlib import Path
 
-from .io import write_csv
+from ..io import write_csv
 
 
 METRIC_LABELS = {

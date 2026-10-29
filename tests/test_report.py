@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 import unittest
 
-from analysis.build_report import build, figure_catalog
+from analysis.reporting.build_report import build, figure_catalog
 from test_analysis import SharedFilesystemTemporaryDirectory
 
 

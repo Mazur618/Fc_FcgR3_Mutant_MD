@@ -10,7 +10,7 @@ import json
 from pathlib import Path
 import platform
 
-from .io import digest, write_csv
+from ..io import digest, write_csv
 
 
 def read_protocol(path):
@@ -239,7 +239,7 @@ def run(protocol, cfg, system, replicate, out):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--protocol', type=Path, default=Path(__file__).resolve().parents[1] / 'config/analysis_protocol.json')
+    parser.add_argument('--protocol', type=Path, default=Path(__file__).resolve().parents[2] / 'config/analysis_protocol.json')
     sub = parser.add_subparsers(dest='command', required=True)
     inventory = sub.add_parser('inventory', help='lightweight input audit; no trajectory reads')
     inventory.add_argument('--out', type=Path, required=True)

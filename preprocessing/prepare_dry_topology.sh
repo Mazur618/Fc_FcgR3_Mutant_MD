@@ -1,5 +1,5 @@
 #!/bin/bash
-# usage: bash preparation/prepare_dry_topology.sh NAME
+# usage: bash preprocessing/prepare_dry_topology.sh NAME
 # Makes dry.NAME.prmtop and NAME.ntwprt (solute atom count for ntwprt). Use for WT too.
 set -e
 NAME=$1
