@@ -204,3 +204,19 @@ and ZIP filename rather than overwriting an existing report.
 * Environment specifications and repository documentation are provided at the root.
   Select a license and arrange data access before publication. Generated inventory
   JSON contains local absolute paths and should not be published unchanged.
+
+## Structural analysis implementation
+
+`structure/trajectory.py` keeps the command-line interface and numerical helpers
+in one module. `run()` coordinates four stages: `load_and_validate()` checks
+inputs and molecular identity; `prepare_selections()` creates reusable atom groups;
+`analyze_frames()` processes the configured window; and `write_results()` writes
+tables and the completion record. Within the frame loop,
+`calculate_structural_metrics()` handles alignment and geometry, while
+`calculate_contact_pairs()` deduplicates residue pairs before occupancy counting.
+`validate_frame()` checks coordinates and time independently of the measurements.
+
+The refactor preserves output filenames, columns, frame numbering, units,
+contact definitions, and completion/overwrite protections. Synthetic trajectory
+tests exercise sampling, RMSDs, contact and salt-bridge occupancy, hydrogen
+exclusion, invalid coordinates, and truncated inputs.

@@ -77,8 +77,6 @@ def residue_map(reference, cfg):
     return rows
 
 
-
-
 def input_records(protocol, cfg):
     root = (protocol.parent / cfg['prep_root']).resolve()
     records = []
@@ -99,8 +97,6 @@ def input_records(protocol, cfg):
     return records
 
 
-
-
 def pair_counts(atom_pairs, left_residues, right_residues):
     """One residue-pair observation per frame, regardless of atom-pair count."""
     return {(int(left_residues[i]), int(right_residues[j])) for i, j in atom_pairs}
@@ -116,13 +112,10 @@ def kabsch_fit(x, y):
     return left @ flip @ right, xc, yc
 
 
-def run(protocol, cfg, system, replicate, out):
-    out = Path(out)
-    if out.exists():
-        raise FileExistsError(f'refusing to replace existing output directory: {out}')
+def load_and_validate(protocol, cfg, system, replicate):
+    """Locate inputs and verify topology, mutation identity, masses, and window."""
     import numpy as np
     import MDAnalysis as mda
-    from MDAnalysis.lib.distances import capped_distance
 
     records = input_records(protocol, cfg)
     rec = next((r for r in records if r['system'] == system and
@@ -133,15 +126,15 @@ def run(protocol, cfg, system, replicate, out):
         raise ValueError('missing topology or trajectory')
     reference = (protocol.parent / cfg['reference_pdb']).resolve()
     mapping = residue_map(reference, cfg)
-    u = mda.Universe(rec['topology'], rec['trajectory'])
-    if len(u.residues) != len(mapping):
+    universe = mda.Universe(rec['topology'], rec['trajectory'])
+    if len(universe.residues) != len(mapping):
         raise ValueError('wrong residue count; use original dry topology, not MM reordered topology')
-    if not np.all(np.isfinite(u.atoms.masses)) or np.any(u.atoms.masses <= 0):
+    if not np.all(np.isfinite(universe.atoms.masses)) or np.any(universe.atoms.masses <= 0):
         raise ValueError('positive finite atom masses are required for COM and Rg')
     mutation = None if system == 'WT' else (int(system[1:-1]), system[-1])
     aa3 = dict(A='ALA', S='SER')
     aliases = {'NLN': 'ASN', 'CYX': 'CYS', 'HID': 'HIS', 'HIE': 'HIS', 'HIP': 'HIS'}
-    for residue, row in zip(u.residues, mapping):
+    for residue, row in zip(universe.residues, mapping):
         expected = row['name']
         if mutation and row['component'].startswith('protein_') and row['chain'] in 'AB' and row['number'] == mutation[0]:
             expected = aa3[mutation[1]]
@@ -151,10 +144,17 @@ def run(protocol, cfg, system, replicate, out):
         if actual != expected:
             raise ValueError(f"residue layout mismatch at {row['index']}: {actual} != {expected}")
         row['name'] = str(residue.resname)
-    if len(u.trajectory) < cfg['end_frame']:
+    if len(universe.trajectory) < cfg['end_frame']:
         raise ValueError('trajectory shorter than specified window; refusing partial analysis')
+    return universe, mapping, rec, reference
+
+
+def prepare_selections(universe, mapping, cfg):
+    """Build fixed atom groups and backbone/reference indices once per run."""
+    import numpy as np
+
     backbone, target = [], []
-    for residue, row in zip(u.residues[:596], mapping[:596]):
+    for residue, row in zip(universe.residues[:596], mapping[:596]):
         for name in ('N', 'CA', 'C'):
             matches = residue.atoms.select_atoms('name ' + name)
             if len(matches) != 1:
@@ -170,50 +170,101 @@ def run(protocol, cfg, system, replicate, out):
     ch2 = group(cfg['ch2_resids'])
     receptor = group([[426, 596]])
     fc_bb = group([[1, 425]])
-    def rms(x, y):
-        return float(np.sqrt(np.mean(np.sum((x - y) ** 2, axis=1))))
-    heavy = u.atoms.select_atoms('not name H*')
-    fc = heavy[np.array([mapping[i]['partner'] == 'Fc' for i in heavy.resindices])]
-    rc = heavy[np.array([mapping[i]['partner'] == 'FcGR3a' for i in heavy.resindices])]
+    heavy = universe.atoms.select_atoms('not name H*')
+    fc_heavy = heavy[np.array([mapping[i]['partner'] == 'Fc' for i in heavy.resindices])]
+    receptor_heavy = heavy[np.array([mapping[i]['partner'] == 'FcGR3a' for i in heavy.resindices])]
     charged = '(resname ARG and name NE NH1 NH2) or (resname LYS and name NZ) or (resname HIP and name ND1 NE2)'
     acidic = '(resname ASP and name OD1 OD2) or (resname GLU and name OE1 OE2)'
-    selections = [(fc, rc)]
-    salt_selections = [(fc.select_atoms(charged), rc.select_atoms(acidic)),
-                       (fc.select_atoms(acidic), rc.select_atoms(charged))]
-    fc_all = u.atoms[np.array([mapping[i]['partner'] == 'Fc' for i in u.atoms.resindices])]
-    rc_all = u.atoms[np.array([mapping[i]['partner'] == 'FcGR3a' for i in u.atoms.resindices])]
+    selections = [(fc_heavy, receptor_heavy)]
+    salt_selections = [(fc_heavy.select_atoms(charged), receptor_heavy.select_atoms(acidic)),
+                       (fc_heavy.select_atoms(acidic), receptor_heavy.select_atoms(charged))]
+    fc_all = universe.atoms[np.array([mapping[i]['partner'] == 'Fc' for i in universe.atoms.resindices])]
+    receptor_all = universe.atoms[np.array([mapping[i]['partner'] == 'FcGR3a' for i in universe.atoms.resindices])]
+    return dict(backbone=backbone, target=target, ch3=ch3,
+                domains=[('CH3', ch3), ('CH2', ch2), ('receptor', receptor)],
+                self_fit_domains=[('Fc', fc_bb), ('receptor', receptor)],
+                fc_all=fc_all, receptor_all=receptor_all,
+                contacts=[('contact', selections, cfg['heavy_atom_contact_A']),
+                          ('salt_bridge', salt_selections, cfg['salt_bridge_A'])])
+
+
+def rms_distance(x, y):
+    """Root-mean-square Cartesian displacement between matching coordinates."""
+    import numpy as np
+    return float(np.sqrt(np.mean(np.sum((x - y) ** 2, axis=1))))
+
+
+def validate_frame(universe, timestep, previous_time):
+    """Reject invalid coordinates and non-increasing sampled times."""
+    import numpy as np
+    if not np.all(np.isfinite(universe.atoms.positions)) or not np.isfinite(timestep.time):
+        raise ValueError(f'nonfinite coordinates or time at frame {timestep.frame + 1}')
+    if previous_time is not None and timestep.time / 1000 <= previous_time:
+        raise ValueError('trajectory time must increase between sampled frames')
+
+
+def calculate_structural_metrics(universe, selections):
+    """Calculate common-reference/self-fit RMSDs, partner distance, and size."""
+    import numpy as np
+
+    backbone, target, ch3 = (selections[key] for key in ('backbone', 'target', 'ch3'))
+    x = universe.atoms.positions[backbone].astype(float)
+    rot, center, refcenter = kabsch_fit(x[ch3], target[ch3])
+    aligned = (x - center) @ rot + refcenter
+    metrics = {}
+    for name, ids in selections['domains']:
+        metrics[name + '_common_reference_rmsd_A'] = rms_distance(aligned[ids], target[ids])
+    for name, ids in selections['self_fit_domains']:
+        rot2, cx, cy = kabsch_fit(x[ids], target[ids])
+        metrics[name + '_self_fit_rmsd_A'] = rms_distance((x[ids] - cx) @ rot2 + cy, target[ids])
+    fc_center = selections['fc_all'].center_of_mass()
+    receptor_center = selections['receptor_all'].center_of_mass()
+    metrics['partner_COM_distance_A'] = float(np.linalg.norm(fc_center - receptor_center))
+    metrics['complex_Rg_A'] = float(universe.atoms.radius_of_gyration())
+    return metrics
+
+
+def calculate_contact_pairs(contact_groups):
+    """Return unique residue pairs per contact type for the current frame."""
+    from MDAnalysis.lib.distances import capped_distance
+
+    observations = {}
+    for kind, groups, cutoff in contact_groups:
+        pairs = set()
+        for left, right in groups:
+            if len(left) and len(right):
+                # Deliberately no minimum-image distances: use the imaged complex.
+                atom_pairs = capped_distance(left.positions, right.positions, cutoff,
+                                             return_distances=False)
+                pairs.update(pair_counts(atom_pairs, left.resindices, right.resindices))
+        observations[kind] = pairs
+    return observations
+
+
+def analyze_frames(universe, selections, cfg):
+    """Analyze the configured frame window in one pass through the trajectory."""
     counts = {'contact': Counter(), 'salt_bridge': Counter()}
     frames = []
-    for ts in u.trajectory[cfg['start_frame'] - 1:cfg['end_frame']:cfg['stride']]:
-        if not np.all(np.isfinite(u.atoms.positions)) or not np.isfinite(ts.time):
-            raise ValueError(f'nonfinite coordinates or time at frame {ts.frame + 1}')
-        if frames and ts.time / 1000 <= frames[-1]['time_ns']:
-            raise ValueError('trajectory time must increase between sampled frames')
-        x = u.atoms.positions[backbone].astype(float)
-        rot, center, refcenter = kabsch_fit(x[ch3], target[ch3])
-        aligned = (x - center) @ rot + refcenter
-        metrics = {}
-        for name, ids in [('CH3', ch3), ('CH2', ch2), ('receptor', receptor)]:
-            metrics[name + '_common_reference_rmsd_A'] = rms(aligned[ids], target[ids])
-        for name, ids in [('Fc', fc_bb), ('receptor', receptor)]:
-            rot2, cx, cy = kabsch_fit(x[ids], target[ids])
-            metrics[name + '_self_fit_rmsd_A'] = rms((x[ids] - cx) @ rot2 + cy, target[ids])
-        metrics['partner_COM_distance_A'] = float(np.linalg.norm(fc_all.center_of_mass() - rc_all.center_of_mass()))
-        metrics['complex_Rg_A'] = float(u.atoms.radius_of_gyration())
-        observations = {}
-        for kind, groups, cutoff in [('contact', selections, cfg['heavy_atom_contact_A']),
-                                      ('salt_bridge', salt_selections, cfg['salt_bridge_A'])]:
-            pairs = set()
-            for left, right in groups:
-                if len(left) and len(right):
-                    # Deliberately no minimum-image distances: use the imaged complex.
-                    atom_pairs = capped_distance(left.positions, right.positions, cutoff,
-                                                 return_distances=False)
-                    pairs.update(pair_counts(atom_pairs, left.resindices, right.resindices))
+    window = slice(cfg['start_frame'] - 1, cfg['end_frame'], cfg['stride'])
+    for timestep in universe.trajectory[window]:
+        previous_time = frames[-1]['time_ns'] if frames else None
+        validate_frame(universe, timestep, previous_time)
+        metrics = calculate_structural_metrics(universe, selections)
+        contacts = calculate_contact_pairs(selections['contacts'])
+        for kind, pairs in contacts.items():
             counts[kind].update(pairs)
-            observations[kind + '_residue_pairs'] = len(pairs)
-        frames.append(dict(frame=ts.frame + 1, time_ns=float(ts.time) / 1000,
+        observations = {kind + '_residue_pairs': len(pairs)
+                        for kind, pairs in contacts.items()}
+        frames.append(dict(frame=timestep.frame + 1, time_ns=float(timestep.time) / 1000,
                            **metrics, **observations))
+    return frames, counts
+
+
+def write_results(out, frames, counts, mapping, protocol, cfg, rec, reference):
+    """Write the existing CSV schema and mark completion only after all outputs."""
+    import numpy as np
+    import MDAnalysis as mda
+
     out.mkdir(parents=True, exist_ok=False)
     write_csv(out / 'frames.csv', list(frames[0]), frames)
     map_fields = ['index', 'label', 'name', 'partner', 'component', 'chain', 'number', 'icode']
@@ -234,6 +285,17 @@ def run(protocol, cfg, system, replicate, out):
     # Written last: downstream tools accept only completed runs.
     with (out / 'complete.json').open('x') as fh:
         json.dump(provenance, fh, indent=2)
+
+
+def run(protocol, cfg, system, replicate, out):
+    """Validate inputs, prepare selections, analyze frames, and write results."""
+    out = Path(out)
+    if out.exists():
+        raise FileExistsError(f'refusing to replace existing output directory: {out}')
+    universe, mapping, record, reference = load_and_validate(protocol, cfg, system, replicate)
+    selections = prepare_selections(universe, mapping, cfg)
+    frames, counts = analyze_frames(universe, selections, cfg)
+    write_results(out, frames, counts, mapping, protocol, cfg, record, reference)
     print(f'Completed {system} rep{replicate}: {len(frames)} frames -> {out}')
 
 
