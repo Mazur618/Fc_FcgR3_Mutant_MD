@@ -58,37 +58,51 @@ def load_runs(paths):
     return cfg, runs
 
 
-def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('runs', nargs='+', type=Path)
-    parser.add_argument('--out', required=True, type=Path)
-    args = parser.parse_args()
-    if args.out.exists():
-        raise FileExistsError(f'refusing existing output directory: {args.out}')
-    cfg, runs = load_runs(args.runs)
-    import numpy as np
-    import matplotlib
-    matplotlib.use('Agg')
+def system_runs(runs, system):
+    return sorted([r for r in runs if r['meta']['input']['system'] == system],
+                  key=lambda r: r['meta']['input']['replicate'])
+
+
+def save_figure(fig, out, name):
     import matplotlib.pyplot as plt
-    plt.rcParams.update({'font.size': 9, 'axes.spines.top': False, 'axes.spines.right': False,
-                         'pdf.fonttype': 42, 'svg.fonttype': 'none'})
+    for ext in ('png', 'pdf'):
+        fig.savefig(out / f'{name}.{ext}', dpi=200, bbox_inches='tight')
+    plt.close(fig)
+
+
+def summarize_replicates(cfg, runs):
+    import numpy as np
     systems = cfg['systems']
-    args.out.mkdir(parents=True, exist_ok=False)
-    def system_runs(s):
-        return sorted([r for r in runs if r['meta']['input']['system'] == s],
-                      key=lambda r: r['meta']['input']['replicate'])
-    def save(fig, name):
-        for ext in ('png', 'pdf'):
-            fig.savefig(args.out / f'{name}.{ext}', dpi=200, bbox_inches='tight')
-        plt.close(fig)
     metrics = [k for k in runs[0]['frames'][0] if k not in ('frame', 'time_ns')]
     summary = []
     for s in systems:
-        for r in system_runs(s):
+        for r in system_runs(runs, s):
             row = dict(system=s, replicate=r['meta']['input']['replicate'])
             row.update({m: float(np.mean([f[m] for f in r['frames']])) for m in metrics})
             summary.append(row)
-    write_csv(args.out / 'replicate_means.csv', ['system', 'replicate'] + metrics, summary)
+    return metrics, summary
+
+
+def compare_residue_pairs(cfg, runs):
+    import numpy as np
+    systems = cfg['systems']
+    pair_union = sorted(set().union(*(r['pairs'] for r in runs)))
+    pair_rows = []
+    for key in pair_union:
+        for s in systems:
+            values = [r['pairs'].get(key, 0.0) for r in system_runs(runs, s)]
+            wt = [r['pairs'].get(key, 0.0) for r in system_runs(runs, 'WT')]
+            pair_rows.append(dict(kind=key[0], Fc_label=key[1], receptor_label=key[2], system=s,
+                                  mean_occupancy=float(np.mean(values)),
+                                  sd_between_replicates=float(np.std(values, ddof=1)) if len(values) > 1 else '',
+                                  delta_occupancy_vs_WT=float(np.mean(values) - np.mean(wt))))
+    return pair_union, pair_rows
+
+
+def plot_structural_summary(cfg, metrics, summary, out):
+    import numpy as np
+    import matplotlib.pyplot as plt
+    systems = cfg['systems']
     nrow = math.ceil(len(metrics) / 3)
     fig, axes = plt.subplots(nrow, 3, figsize=(14, 3.4 * nrow), squeeze=False)
     for ax, metric in zip(axes.flat, metrics):
@@ -106,14 +120,20 @@ def main():
         ax.set_visible(False)
     fig.suptitle('Structure and interface: dots = replicate means; bars = mean ± between-replicate SD')
     fig.tight_layout()
-    save(fig, 'structure_and_interface')
+    save_figure(fig, out, 'structure_and_interface')
+
+
+def plot_timecourses(cfg, runs, metrics, out):
+    import numpy as np
+    import matplotlib.pyplot as plt
+    systems = cfg['systems']
     # Separate time-course panels preserve differences among replicates.
     for metric in metrics:
         nrow = math.ceil(len(systems) / 4)
         fig, axes = plt.subplots(nrow, 4, figsize=(14, 3 * nrow), sharex=True, sharey=True,
                                  squeeze=False)
         for ax, s in zip(axes.flat, systems):
-            for r in system_runs(s):
+            for r in system_runs(runs, s):
                 ax.plot([f['time_ns'] for f in r['frames']], [f[metric] for f in r['frames']],
                         lw=0.8, label=f"rep{r['meta']['input']['replicate']}")
             ax.set_title(s)
@@ -125,32 +145,25 @@ def main():
         fig.supylabel(ylabel)
         fig.suptitle(title + '; common WT reference where applicable')
         fig.tight_layout()
-        save(fig, metric + '_timecourses')
-    pair_union = sorted(set().union(*(r['pairs'] for r in runs)))
-    pair_rows = []
-    for key in pair_union:
-        for s in systems:
-            values = [r['pairs'].get(key, 0.0) for r in system_runs(s)]
-            wt = [r['pairs'].get(key, 0.0) for r in system_runs('WT')]
-            pair_rows.append(dict(kind=key[0], Fc_label=key[1], receptor_label=key[2], system=s,
-                                  mean_occupancy=float(np.mean(values)),
-                                  sd_between_replicates=float(np.std(values, ddof=1)) if len(values) > 1 else '',
-                                  delta_occupancy_vs_WT=float(np.mean(values) - np.mean(wt))))
-    fields = ['kind', 'Fc_label', 'receptor_label', 'system', 'mean_occupancy',
-              'sd_between_replicates', 'delta_occupancy_vs_WT']
-    write_csv(args.out / 'pair_comparisons.csv', fields, pair_rows)
+        save_figure(fig, out, metric + '_timecourses')
+
+
+def plot_contact_changes(cfg, runs, pair_union, out):
+    import numpy as np
+    import matplotlib.pyplot as plt
+    systems = cfg['systems']
     for kind in ('contact', 'salt_bridge'):
         keys = [k for k in pair_union if k[0] == kind and max(
-            np.mean([r['pairs'].get(k, 0.0) for r in system_runs(s)]) for s in systems
+            np.mean([r['pairs'].get(k, 0.0) for r in system_runs(runs, s)]) for s in systems
         ) >= cfg['display_min_mean_occupancy']]
-        keys.sort(key=lambda k: max(abs(np.mean([r['pairs'].get(k, 0.0) for r in system_runs(s)]) -
-                                       np.mean([r['pairs'].get(k, 0.0) for r in system_runs('WT')]))
+        keys.sort(key=lambda k: max(abs(np.mean([r['pairs'].get(k, 0.0) for r in system_runs(runs, s)]) -
+                                       np.mean([r['pairs'].get(k, 0.0) for r in system_runs(runs, 'WT')]))
                                    for s in systems), reverse=True)
         # Paginate instead of silently dropping lower-ranked interface pairs.
         for page, start in enumerate(range(0, len(keys), 35), 1):
             selected = keys[start:start + 35]
-            delta = np.array([[np.mean([r['pairs'].get(k, 0.0) for r in system_runs(s)]) -
-                               np.mean([r['pairs'].get(k, 0.0) for r in system_runs('WT')])
+            delta = np.array([[np.mean([r['pairs'].get(k, 0.0) for r in system_runs(runs, s)]) -
+                               np.mean([r['pairs'].get(k, 0.0) for r in system_runs(runs, 'WT')])
                                for s in systems if s != 'WT'] for k in selected])
             fig, ax = plt.subplots(figsize=(9, max(4, len(selected) * 0.25)))
             im = ax.imshow(delta * 100, cmap='RdBu_r', vmin=-100, vmax=100, aspect='auto')
@@ -160,12 +173,44 @@ def main():
             fig.colorbar(im, ax=ax, orientation='horizontal', pad=0.3, shrink=0.75,
                          label='Variant − WT occupancy (percentage points)')
             fig.tight_layout()
-            save(fig, f'{kind}_changes_{page}')
-    with (args.out / 'figure_manifest.json').open('x') as fh:
+            save_figure(fig, out, f'{kind}_changes_{page}')
+
+
+def run_comparison(paths, out):
+    """Load completed runs, summarize replicates, and render structural comparisons."""
+    out = Path(out)
+    if out.exists():
+        raise FileExistsError(f'refusing existing output directory: {out}')
+    cfg, runs = load_runs(paths)
+    import numpy as np
+    import matplotlib
+    matplotlib.use('Agg')
+    import matplotlib.pyplot as plt
+    plt.rcParams.update({'font.size': 9, 'axes.spines.top': False, 'axes.spines.right': False,
+                         'pdf.fonttype': 42, 'svg.fonttype': 'none'})
+    out.mkdir(parents=True, exist_ok=False)
+    metrics, summary = summarize_replicates(cfg, runs)
+    write_csv(out / 'replicate_means.csv', ['system', 'replicate'] + metrics, summary)
+    plot_structural_summary(cfg, metrics, summary, out)
+    plot_timecourses(cfg, runs, metrics, out)
+    pair_union, pair_rows = compare_residue_pairs(cfg, runs)
+    fields = ['kind', 'Fc_label', 'receptor_label', 'system', 'mean_occupancy',
+              'sd_between_replicates', 'delta_occupancy_vs_WT']
+    write_csv(out / 'pair_comparisons.csv', fields, pair_rows)
+    plot_contact_changes(cfg, runs, pair_union, out)
+    with (out / 'figure_manifest.json').open('x') as fh:
         json.dump(dict(protocol=cfg, sources=[r['path'] for r in runs],
                        uncertainty='between-replicate SD; descriptive, not confidence intervals',
                        interface='union of residue pairs; display threshold on maximum system mean'), fh, indent=2)
-    print(f'Wrote tables and PNG/PDF figures -> {args.out}')
+    print(f'Wrote tables and PNG/PDF figures -> {out}')
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('runs', nargs='+', type=Path)
+    parser.add_argument('--out', required=True, type=Path)
+    args = parser.parse_args()
+    run_comparison(args.runs, args.out)
 
 
 if __name__ == '__main__':

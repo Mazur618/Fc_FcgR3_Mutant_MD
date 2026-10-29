@@ -83,7 +83,8 @@ def figure_html(fig):
             f'<a href="assets/{escape(fig["pdf"])}">PDF</a></figcaption></figure>')
 
 
-def home(project, figures):
+def prepare_home_content(project, figures):
+    """Read summaries and prepare tables and highlighted values for the main page."""
     structural = read(project / 'defined_figures_review/replicate_means.csv')
     binding = read(project / 'defined_binding_figures/comparisons.csv')
     pairs = read(project / 'defined_figures_review/pair_comparisons.csv')
@@ -122,6 +123,13 @@ def home(project, figures):
     egb = component('D265A', 'EGB') - component('WT', 'EGB')
     energy = next(f for f in figures if f['source'].stem == 'binding_comparison')
     e333 = [float(r['ddG_vs_WT']) for r in windows if r['system'] == 'E333A']
+    return structure_table, interface_table, sensitivity_rows, delta, eel, egb, energy, e333
+
+
+def home(project, figures):
+    """Render the main findings page from prepared tables and highlighted values."""
+    (structure_table, interface_table, sensitivity_rows, delta,
+     eel, egb, energy, e333) = prepare_home_content(project, figures)
     body = '<section class="takeaway"><h2>Local interface changes are clearer than mutant energy rankings</h2>'
     body += ('<p class="lead">Most mutants cannot be reliably ordered by whole-partner MM/GBSA with three short replicates. '
              'D265A has the clearest unfavorable shift, while selected protein and glycan contacts change consistently across tested settings.</p>'

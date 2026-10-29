@@ -220,3 +220,25 @@ The refactor preserves output filenames, columns, frame numbering, units,
 contact definitions, and completion/overwrite protections. Synthetic trajectory
 tests exercise sampling, RMSDs, contact and salt-bridge occupancy, hydrogen
 exclusion, invalid coordinates, and truncated inputs.
+
+## Other workflow stages
+
+The other supported commands follow the same pattern: command-line entry points
+delegate to named loading, calculation, rendering, and writing functions.
+
+- `structure/plot_structure.py`: summarize replicate means, compare residue pairs,
+  then render overview, time-course, and contact-change figures.
+- `mmgbsa/plot_binding.py`: validate and average snapshot energies, calculate
+  WT comparisons and multiplicity-adjusted statistics, then render each figure family.
+- `sensitivity.py`: validate primary provenance, prepare contact groups, scan all
+  conditions in one pass, verify the primary baseline, and write per-run results.
+  Summary functions separately handle contact and nested-window comparisons.
+- `reporting/build_report.py`: validate all inputs, render pages, copy assets,
+  write the manifest, and optionally create a new archive. `report_pages.py`
+  separates summary-table preparation from page rendering.
+
+Preprocessing follows validation, mutation/repacking, assembly, bond checks, and
+file-writing stages. Scientific libraries are loaded when the corresponding
+operation runs; importing a preparation module does not start computation or
+write files. The existing CLI options, scientific settings, and output schemas
+are preserved. Archived `legacy/` scripts are unchanged.

@@ -142,14 +142,8 @@ def sensitivity_summary(project):
     return lines
 
 
-def build(project, out, archive=None):
-    from .report_pages import home, supplemental
-    import shutil
-
-    project = Path(project).resolve()
-    out = Path(out)
-    if out.exists() or (archive and Path(archive).exists()):
-        raise FileExistsError('report directory/archive must be new')
+def prepare_report_inputs(project):
+    """Locate and validate every figure and table before creating outputs."""
     figures = figure_catalog(project)
     tables = [('primary_structural_means.csv', project / 'defined_figures_review/replicate_means.csv'),
               ('primary_pair_comparisons.csv', project / 'defined_figures_review/pair_comparisons.csv'),
@@ -163,11 +157,24 @@ def build(project, out, archive=None):
     for _, source in tables:
         if not source.is_file():
             raise FileNotFoundError(source)
+    return figures, tables
+
+
+def render_report_pages(project, figures, tables):
+    """Render both offline pages from validated summary tables."""
+    from .report_pages import home, supplemental
+
     # Read/validate summary inputs before creating outputs.
     main_html = home(project, figures)
     tablelinks = [f'<li><a href="assets/{escape(name)}">{escape(name)}</a></li>' for name, _ in tables]
     supplemental_html = supplemental(figures, tablelinks)
-    summary = sensitivity_summary(project)
+    return main_html, supplemental_html
+
+
+def copy_report_assets(project, out, figures, tables):
+    """Copy selected assets and compute their manifest entries."""
+    import shutil
+
     out.mkdir(parents=True, exist_ok=False)
     assets = out / 'assets'
     assets.mkdir()
@@ -182,6 +189,11 @@ def build(project, out, archive=None):
     for name, source in tables:
         with source.open('rb') as src, (assets / name).open('xb') as dst:
             shutil.copyfileobj(src, dst)
+    return manifest
+
+
+def write_report_files(out, main_html, supplemental_html, manifest, summary):
+    """Write pages and the timestamped report manifest."""
     for name, content in [('index.html', main_html), ('supplemental.html', supplemental_html)]:
         with (out / name).open('x') as fh:
             fh.write(content)
@@ -189,11 +201,29 @@ def build(project, out, archive=None):
         json.dump(dict(created_utc=datetime.now(timezone.utc).isoformat(), figures=manifest,
                        sensitivity_summary=summary, local_only=True,
                        pages=['index.html', 'supplemental.html']), fh, indent=2)
+
+
+def archive_report(out, archive):
+    """Create a new ZIP archive without replacing an existing file."""
+    with zipfile.ZipFile(archive, 'x', compression=zipfile.ZIP_DEFLATED) as z:
+        for path in sorted(out.rglob('*')):
+            if path.is_file():
+                z.write(path, arcname=Path(out.name) / path.relative_to(out))
+
+
+def build(project, out, archive=None):
+    """Validate, render, copy assets, and write the portable report."""
+    project = Path(project).resolve()
+    out = Path(out)
+    if out.exists() or (archive and Path(archive).exists()):
+        raise FileExistsError('report directory/archive must be new')
+    figures, tables = prepare_report_inputs(project)
+    main_html, supplemental_html = render_report_pages(project, figures, tables)
+    summary = sensitivity_summary(project)
+    manifest = copy_report_assets(project, out, figures, tables)
+    write_report_files(out, main_html, supplemental_html, manifest, summary)
     if archive:
-        with zipfile.ZipFile(archive, 'x', compression=zipfile.ZIP_DEFLATED) as z:
-            for path in sorted(out.rglob('*')):
-                if path.is_file():
-                    z.write(path, arcname=Path(out.name) / path.relative_to(out))
+        archive_report(out, archive)
     print(f'Concise home page + {len(figures)} supplemental figures -> {out / "index.html"}')
 
 

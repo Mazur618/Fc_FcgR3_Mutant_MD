@@ -5,8 +5,9 @@ from html.parser import HTMLParser
 import json
 from pathlib import Path
 import unittest
+import zipfile
 
-from analysis.reporting.build_report import build, figure_catalog
+from analysis.reporting.build_report import archive_report, build, figure_catalog
 from test_analysis import SharedFilesystemTemporaryDirectory
 
 
@@ -37,6 +38,23 @@ def write(path, rows):
 
 
 class ReportTests(unittest.TestCase):
+    def test_archive_contains_portable_paths_and_preserves_existing_archive(self):
+        with SharedFilesystemTemporaryDirectory(dir=Path(__file__).parent) as folder:
+            root = Path(folder)
+            report = root / 'report'
+            (report / 'assets').mkdir(parents=True)
+            (report / 'index.html').write_text('synthetic page')
+            (report / 'assets/data.csv').write_text('value\n1\n')
+            archive = root / 'report.zip'
+            archive_report(report, archive)
+            with zipfile.ZipFile(archive) as contents:
+                self.assertEqual(set(contents.namelist()), {'report/index.html', 'report/assets/data.csv'})
+                self.assertEqual(contents.read('report/assets/data.csv'), b'value\n1\n')
+            before = archive.read_bytes()
+            with self.assertRaises(FileExistsError):
+                archive_report(report, archive)
+            self.assertEqual(archive.read_bytes(), before)
+
     def test_two_pages_retain_all_figures_and_derive_numbers_from_tables(self):
         with SharedFilesystemTemporaryDirectory(dir=Path(__file__).parent) as folder:
             root = Path(folder)

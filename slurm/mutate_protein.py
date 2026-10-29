@@ -1,14 +1,10 @@
 #!/usr/bin/env python3
-# Requires PyRosetta
-import argparse, pyrosetta
-from pyrosetta import rosetta
-from pyrosetta.rosetta.core.select.residue_selector import (
-    ResidueIndexSelector, NeighborhoodResidueSelector)
-from pyrosetta.rosetta.core.pack.task import TaskFactory
-from pyrosetta.rosetta.core.pack.task.operation import (
-    RestrictToRepacking, OperateOnResidueSubset, PreventRepackingRLT)
+"""Mutate and repack a protein using an explicitly invoked PyRosetta workflow."""
+import argparse
 
-def main():
+
+def argument_parser():
+    """Describe the existing mutation command-line options."""
     ap = argparse.ArgumentParser()
     ap.add_argument("inpdb")
     ap.add_argument("--resi", type=int, help="pose residue index (1-based)")
@@ -19,17 +15,38 @@ def main():
                     help="repack only residues within this distance (A) of the "
                          "mutation; 0 = repack everything")
     ap.add_argument("-o", "--out", default="mut_repacked.pdb")
-    args = ap.parse_args()
+    return ap
+
+
+def parse_args(argv=None):
+    return argument_parser().parse_args(argv)
+
+
+def resolve_residue(pose, args):
+    """Resolve the target pose index or report an invalid chain/residue request."""
+    parser = argument_parser()
+    if args.resi is None:
+        if args.chain is None or args.num is None:
+            parser.error("give --resi, or both --chain and --num")
+        args.resi = pose.pdb_info().pdb2pose(args.chain, args.num)
+        if args.resi == 0:
+            parser.error(f"{args.chain}{args.num} not found in {args.inpdb}")
+    return args.resi
+
+
+def mutate_protein(args):
+    """Load, mutate, repack, and write the protein with the original settings."""
+    import pyrosetta
+    from pyrosetta import rosetta
+    from pyrosetta.rosetta.core.select.residue_selector import (
+        ResidueIndexSelector, NeighborhoodResidueSelector)
+    from pyrosetta.rosetta.core.pack.task import TaskFactory
+    from pyrosetta.rosetta.core.pack.task.operation import (
+        RestrictToRepacking, OperateOnResidueSubset, PreventRepackingRLT)
 
     pyrosetta.init("-mute all")
     pose = pyrosetta.pose_from_pdb(args.inpdb)
-
-    if args.resi is None:
-        if args.chain is None or args.num is None:
-            ap.error("give --resi, or both --chain and --num")
-        args.resi = pose.pdb_info().pdb2pose(args.chain, args.num)
-        if args.resi == 0:
-            ap.error(f"{args.chain}{args.num} not found in {args.inpdb}")
+    args.resi = resolve_residue(pose, args)
     print(f"Mutating pose residue {args.resi} "
           f"({pose.residue(args.resi).name3()} -> {args.aa})")
 
@@ -48,5 +65,10 @@ def main():
     rosetta.protocols.minimization_packing.PackRotamersMover(scorefxn, task).apply(pose)
     pose.dump_pdb(args.out)
 
-if __name__ == "__main__":
+
+def main():
+    mutate_protein(parse_args())
+
+
+if __name__ == '__main__':
     main()

@@ -45,22 +45,16 @@ def load_energy(path):
     return rows
 
 
-def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('runs', nargs='+', type=Path)
-    parser.add_argument('--out', required=True, type=Path)
-    args = parser.parse_args()
-    if args.out.exists():
-        raise FileExistsError(args.out)
-    cfg, runs = load_runs(args.runs)
-    import numpy as np
-    from scipy.stats import t
-    import matplotlib
-    matplotlib.use('Agg')
+def save_figure(fig, out, name):
     import matplotlib.pyplot as plt
-    plt.rcParams.update({'font.size': 10, 'axes.spines.top': False, 'axes.spines.right': False,
-                         'pdf.fonttype': 42})
-    systems = cfg['systems']
+    for ext in ('png', 'pdf'):
+        fig.savefig(out / f'{name}.{ext}', dpi=200, bbox_inches='tight')
+    plt.close(fig)
+
+
+def collect_replicate_energies(runs):
+    """Validate snapshot energies and calculate one mean per replicate."""
+    import numpy as np
     rows, sources = [], []
     for run in runs:
         source = Path(run['meta']['input']['mmgbsa_csv'])
@@ -79,10 +73,15 @@ def main():
             row[metric] = float(np.mean([f[metric] for f in run['frames']]))
         rows.append(row)
         sources.append(dict(path=str(source), sha256=hashlib.sha256(source.read_bytes()).hexdigest()))
+    return rows, sources
+
+
+def compare_binding_energies(systems, rows):
+    """Calculate WT differences, Welch intervals, and Holm-adjusted p-values."""
+    import numpy as np
+    from scipy.stats import t
     def vals(system, term):
         return np.array([r[term] for r in rows if r['system'] == system])
-    def mean(system, term):
-        return float(vals(system, term).mean())
     stats = []
     wt = vals('WT', 'DELTA TOTAL')
     for s in systems:
@@ -105,14 +104,15 @@ def main():
     for i, r in enumerate(sorted(comparisons, key=lambda r: r['p_welch'])):
         adjusted = max(adjusted, (len(comparisons) - i) * r['p_welch'])
         r['p_holm'] = min(1., adjusted)
-    args.out.mkdir(parents=True, exist_ok=False)
-    write_csv(args.out / 'replicates.csv', list(rows[0]), rows)
-    write_csv(args.out / 'comparisons.csv', ['system', 'n_replicates', 'mean_kcal_mol',
-              'sd_between_replicates', 'ddG_vs_WT', 'ci95_lo', 'ci95_hi', 'p_welch', 'p_holm'], stats)
-    def save(fig, name):
-        for ext in ('png', 'pdf'):
-            fig.savefig(args.out / f'{name}.{ext}', dpi=200, bbox_inches='tight')
-        plt.close(fig)
+    return stats
+
+
+def plot_binding_comparison(systems, rows, stats, out):
+    import numpy as np
+    import matplotlib.pyplot as plt
+    comparisons = [r for r in stats if r['system'] != 'WT']
+    def vals(system, term):
+        return np.array([r[term] for r in rows if r['system'] == system])
     fig, axes = plt.subplots(1, 2, figsize=(12, 5), gridspec_kw={'width_ratios': [1.3, 1]})
     for i, s in enumerate(systems):
         v = vals(s, 'DELTA TOTAL')
@@ -130,7 +130,16 @@ def main():
     axes[1].set_xlabel('Variant − WT (kcal/mol)')
     axes[1].set_title('Difference with unadjusted 95% Welch CI')
     fig.tight_layout()
-    save(fig, 'binding_comparison')
+    save_figure(fig, out, 'binding_comparison')
+
+
+def plot_energy_components(systems, rows, out):
+    import numpy as np
+    import matplotlib.pyplot as plt
+    def vals(system, term):
+        return np.array([r[term] for r in rows if r['system'] == system])
+    def mean(system, term):
+        return float(vals(system, term).mean())
     variants = [s for s in systems if s != 'WT']
     fig, axes = plt.subplots(1, 2, figsize=(13, 5))
     for ax, terms, title in [(axes[0], ['EEL', 'EGB'], 'Direct electrostatics and GB solvation'),
@@ -146,7 +155,12 @@ def main():
         ax.set_title(title)
         ax.legend(fontsize=8)
     fig.tight_layout()
-    save(fig, 'energy_components')
+    save_figure(fig, out, 'energy_components')
+
+
+def plot_contact_energy_relationship(systems, rows, out):
+    import numpy as np
+    import matplotlib.pyplot as plt
     fig, axes = plt.subplots(1, 2, figsize=(11, 4.5), sharey=True)
     colors = plt.get_cmap('tab10')
     for ax, metric in zip(axes, ['contact_residue_pairs', 'salt_bridge_residue_pairs']):
@@ -159,15 +173,45 @@ def main():
     axes[1].legend(bbox_to_anchor=(1.03, 1), loc='upper left', fontsize=8)
     fig.suptitle('Each point is one replicate; exploratory structural–energetic comparison')
     fig.tight_layout()
-    save(fig, 'contacts_vs_binding')
-    with (args.out / 'provenance.json').open('x') as fh:
+    save_figure(fig, out, 'contacts_vs_binding')
+
+
+def run_comparison(paths, out):
+    """Load runs, compare energies, and write figures, tables, and provenance."""
+    out = Path(out)
+    if out.exists():
+        raise FileExistsError(out)
+    cfg, runs = load_runs(paths)
+    import matplotlib
+    matplotlib.use('Agg')
+    import matplotlib.pyplot as plt
+    plt.rcParams.update({'font.size': 10, 'axes.spines.top': False, 'axes.spines.right': False,
+                         'pdf.fonttype': 42})
+    rows, sources = collect_replicate_energies(runs)
+    stats = compare_binding_energies(cfg['systems'], rows)
+    out.mkdir(parents=True, exist_ok=False)
+    write_csv(out / 'replicates.csv', list(rows[0]), rows)
+    write_csv(out / 'comparisons.csv', ['system', 'n_replicates', 'mean_kcal_mol',
+              'sd_between_replicates', 'ddG_vs_WT', 'ci95_lo', 'ci95_hi', 'p_welch', 'p_holm'], stats)
+    plot_binding_comparison(cfg['systems'], rows, stats, out)
+    plot_energy_components(cfg['systems'], rows, out)
+    plot_contact_energy_relationship(cfg['systems'], rows, out)
+    with (out / 'provenance.json').open('x') as fh:
         json.dump(dict(protocol=cfg, energy_sources=sources, structural_runs=[r['path'] for r in runs],
                        caveat='Whole-partner energies; entropy omitted. CSV row order assumes original approved window. '
                               'Confidence intervals are unadjusted; p_holm adjusts comparisons. Component bars are descriptive.'), fh, indent=2)
     print('system mean SD ddG [95% CI] p_Holm')
     for r in stats:
         print(r)
-    print(f'Wrote MM/GBSA figures and tables -> {args.out}')
+    print(f'Wrote MM/GBSA figures and tables -> {out}')
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('runs', nargs='+', type=Path)
+    parser.add_argument('--out', required=True, type=Path)
+    args = parser.parse_args()
+    run_comparison(args.runs, args.out)
 
 
 if __name__ == '__main__':

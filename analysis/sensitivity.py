@@ -43,12 +43,9 @@ def minimum_pairs(atom_pairs, distances, left_residues, right_residues, nres):
     return keys, minimum
 
 
-def analyze_run(run, out):
-    import numpy as np
+def load_sensitivity_inputs(run):
+    """Validate primary provenance and load the dense trajectory and residue map."""
     import MDAnalysis as mda
-    from MDAnalysis.lib.distances import capped_distance
-    if out.exists():
-        raise FileExistsError(out)
     meta = run['meta']
     source = meta['input']
     if digest(source['topology']) != meta['topology_sha256']:
@@ -60,7 +57,12 @@ def analyze_run(run, out):
         raise ValueError('unexpected residue count or incomplete trajectory')
     if any(str(r.resname) != row['name'] for r, row in zip(u.residues, mapping)):
         raise ValueError('topology identities differ from primary residue map')
-    nres = len(mapping)
+    return u, mapping
+
+
+def prepare_contact_groups(u, mapping):
+    """Select heavy and charged atoms once for all sensitivity conditions."""
+    import numpy as np
     heavy = u.atoms.select_atoms('not name H*')
     fc = heavy[np.array([mapping[i]['partner'] == 'Fc' for i in heavy.resindices])]
     rc = heavy[np.array([mapping[i]['partner'] == 'FcGR3a' for i in heavy.resindices])]
@@ -69,6 +71,14 @@ def analyze_run(run, out):
     groups = {'contact': [(fc, rc)],
               'salt_bridge': [(fc.select_atoms(positive), rc.select_atoms(negative)),
                               (fc.select_atoms(negative), rc.select_atoms(positive))]}
+    return groups
+
+
+def scan_contact_conditions(u, mapping, groups):
+    """Accumulate all cutoffs, windows, and strides in a single trajectory pass."""
+    import numpy as np
+    from MDAnalysis.lib.distances import capped_distance
+    nres = len(mapping)
     counters = {c: Counter() for c in conditions()}
     nframes = Counter()
     clock = []
@@ -95,6 +105,13 @@ def analyze_run(run, out):
                         condition = (kind, start, stride, cutoff)
                         counters[condition].update(hits[cutoff])
                         nframes[condition] += 1
+    return counters, nframes, clock
+
+
+def validate_primary_counts(run, mapping, counters):
+    """Require exact agreement with the original primary residue-pair counts."""
+    nres = len(mapping)
+    source = run['meta']['input']
     # Exact regression against primary contact counts, not just matching means.
     index = {row['label']: i for i, row in enumerate(mapping)}
     expected = {kind: Counter() for kind in CUTOFFS}
@@ -105,6 +122,15 @@ def analyze_run(run, out):
     for kind in CUTOFFS:
         if counters[(kind, 301, 5, PRIMARY_CUTOFF[kind])] != expected[kind]:
             raise ValueError(f'sensitivity baseline differs from primary: {source}, {kind}')
+
+
+def write_run_sensitivity(run, out, mapping, counters, nframes, clock):
+    """Write sensitivity tables and completion provenance."""
+    import numpy as np
+    import MDAnalysis as mda
+    meta = run['meta']
+    source = meta['input']
+    nres = len(mapping)
     rows, counts = [], []
     for condition, counter in counters.items():
         kind, start, stride, cutoff = condition
@@ -129,17 +155,19 @@ def analyze_run(run, out):
     print(f"Sensitivity completed {source['system']} rep{source['replicate']}", flush=True)
 
 
-def summarize(cfg, runs, root):
-    import numpy as np
-    import matplotlib
-    matplotlib.use('Agg')
-    import matplotlib.pyplot as plt
-    plt.rcParams.update({'font.size': 9, 'axes.spines.top': False, 'axes.spines.right': False,
-                         'pdf.fonttype': 42})
-    folder = root / 'summary'
-    folder.mkdir(exist_ok=False)
-    systems = cfg['systems']
-    variants = [s for s in systems if s != 'WT']
+def analyze_run(run, out):
+    """Validate inputs, scan conditions, check the baseline, and write one run."""
+    if out.exists():
+        raise FileExistsError(out)
+    universe, mapping = load_sensitivity_inputs(run)
+    groups = prepare_contact_groups(universe, mapping)
+    counters, nframes, clock = scan_contact_conditions(universe, mapping, groups)
+    validate_primary_counts(run, mapping, counters)
+    write_run_sensitivity(run, out, mapping, counters, nframes, clock)
+
+
+def load_sensitivity_results(runs, root):
+    """Read completed per-replicate sensitivity tables."""
     pairs, count_rows = {}, []
     for run in runs:
         source = run['meta']['input']
@@ -157,6 +185,22 @@ def summarize(cfg, runs, root):
                 key = (r['system'], int(r['replicate']), r['kind'], int(r['start_frame']),
                        int(r['stride']), float(r['cutoff_A']), r['Fc_label'], r['receptor_label'])
                 pairs[key] = float(r['occupancy'])
+    return pairs, count_rows
+
+
+def save_figure(fig, folder, name):
+    import matplotlib.pyplot as plt
+    for ext in ('png', 'pdf'):
+        fig.savefig(folder / f'{name}.{ext}', dpi=180, bbox_inches='tight')
+    plt.close(fig)
+
+
+def summarize_contacts(cfg, pairs, count_rows, folder):
+    """Aggregate equal-weight replicate occupancies and render contact sensitivity."""
+    import numpy as np
+    import matplotlib.pyplot as plt
+    systems = cfg['systems']
+    variants = [s for s in systems if s != 'WT']
     write_csv(folder / 'replicate_counts.csv', list(count_rows[0]), count_rows)
     def occupancy(s, condition, pair):
         return float(np.mean([pairs.get((s, rep, *condition, *pair), 0.) for rep in cfg['replicates']]))
@@ -178,10 +222,14 @@ def summarize(cfg, runs, root):
                                           delta_vs_WT=delta(s, condition, pair)))
     write_csv(folder / 'pair_sensitivity.csv', list(pair_rows[0]), pair_rows)
     colors = {s: plt.get_cmap('tab10')(i) for i, s in enumerate(variants)}
-    def save(fig, name):
-        for ext in ('png', 'pdf'):
-            fig.savefig(folder / f'{name}.{ext}', dpi=180, bbox_inches='tight')
-        plt.close(fig)
+    plot_count_sensitivity(variants, colors, count, folder)
+    plot_sampling_sensitivity(variants, colors, union, delta, folder)
+    plot_finding_robustness(variants, union, delta, folder)
+
+
+def plot_count_sensitivity(variants, colors, count, folder):
+    import numpy as np
+    import matplotlib.pyplot as plt
     fig, axes = plt.subplots(2, 2, figsize=(12, 8))
     for i, kind in enumerate(CUTOFFS):
         for s in variants:
@@ -202,7 +250,12 @@ def summarize(cfg, runs, root):
     axes[0, 0].legend(ncol=4, fontsize=8)
     fig.suptitle('Sensitivity of mean interface counts; 50 ps sampling, three replicate means per system')
     fig.tight_layout()
-    save(fig, 'contact_count_sensitivity')
+    save_figure(fig, folder, 'contact_count_sensitivity')
+
+
+def plot_sampling_sensitivity(variants, colors, union, delta, folder):
+    import numpy as np
+    import matplotlib.pyplot as plt
     sampling = []
     fig, axes = plt.subplots(1, 2, figsize=(11, 5))
     for ax, kind in zip(axes, CUTOFFS):
@@ -222,8 +275,13 @@ def summarize(cfg, runs, root):
         ax.set_aspect('equal')
     axes[1].legend(fontsize=7, loc='upper left')
     fig.tight_layout()
-    save(fig, 'sampling_sensitivity')
+    save_figure(fig, folder, 'sampling_sensitivity')
     write_csv(folder / 'sampling_comparison.csv', list(sampling[0]), sampling)
+
+
+def plot_finding_robustness(variants, union, delta, folder):
+    import numpy as np
+    import matplotlib.pyplot as plt
     findings = []
     for kind, number in [('contact', 12), ('salt_bridge', 3)]:
         candidates = [(abs(delta(s, (kind, 301, 5, PRIMARY_CUTOFF[kind]), p)), s, p)
@@ -249,7 +307,19 @@ def summarize(cfg, runs, root):
     ax.set_title('Largest primary occupancy changes across 18 analysis choices per row')
     fig.colorbar(im, ax=ax, label='Variant − WT occupancy (percentage points)')
     fig.tight_layout()
-    save(fig, 'finding_robustness')
+    save_figure(fig, folder, 'finding_robustness')
+
+
+def window_mean(table, system, start, key):
+    import numpy as np
+    return float(np.mean([r[key] for r in table if r['system'] == system and r['start_frame'] == start]))
+
+
+def summarize_windows(cfg, runs, folder):
+    """Compare structural and binding means over the existing nested windows."""
+    import numpy as np
+    import matplotlib.pyplot as plt
+    variants = [s for s in cfg['systems'] if s != 'WT']
     structural, binding = [], []
     for run in runs:
         source = run['meta']['input']
@@ -264,8 +334,6 @@ def summarize(cfg, runs, root):
             binding.append(dict(common, energy_mean=float(np.mean([energy[i]['DELTA TOTAL'] for i in chosen]))))
     write_csv(folder / 'structural_windows.csv', list(structural[0]), structural)
     write_csv(folder / 'binding_windows.csv', list(binding[0]), binding)
-    def window_mean(table, s, start, key):
-        return float(np.mean([r[key] for r in table if r['system'] == s and r['start_frame'] == start]))
     binding_summary = []
     fig, ax = plt.subplots(figsize=(10, 5))
     for j, start in enumerate(STARTS):
@@ -280,7 +348,7 @@ def summarize(cfg, runs, root):
     ax.set_title('Window sensitivity of mean energy differences; existing 50 ps snapshots')
     ax.legend()
     fig.tight_layout()
-    save(fig, 'binding_window_sensitivity')
+    save_figure(fig, folder, 'binding_window_sensitivity')
     write_csv(folder / 'binding_window_comparisons.csv', list(binding_summary[0]), binding_summary)
     keys = ['CH2_common_reference_rmsd_A', 'receptor_common_reference_rmsd_A',
             'Fc_self_fit_rmsd_A', 'receptor_self_fit_rmsd_A', 'partner_COM_distance_A', 'complex_Rg_A']
@@ -298,7 +366,22 @@ def summarize(cfg, runs, root):
     axes[0, 0].legend(fontsize=8)
     fig.suptitle('Window sensitivity of structural means; common WT reference, 50 ps snapshots')
     fig.tight_layout()
-    save(fig, 'structure_window_sensitivity')
+    save_figure(fig, folder, 'structure_window_sensitivity')
+
+
+def summarize(cfg, runs, root):
+    """Load results, summarize contact/window sensitivity, and record completion."""
+    import numpy as np
+    import matplotlib
+    matplotlib.use('Agg')
+    import matplotlib.pyplot as plt
+    plt.rcParams.update({'font.size': 9, 'axes.spines.top': False, 'axes.spines.right': False,
+                         'pdf.fonttype': 42})
+    folder = root / 'summary'
+    folder.mkdir(exist_ok=False)
+    pairs, count_rows = load_sensitivity_results(runs, root)
+    summarize_contacts(cfg, pairs, count_rows, folder)
+    summarize_windows(cfg, runs, folder)
     with (folder / 'complete.json').open('x') as fh:
         json.dump(dict(protocol=cfg, starts=STARTS, strides=STRIDES, cutoffs=CUTOFFS,
                        analyzed_runs=len(runs), baselines_match=True,

@@ -30,6 +30,21 @@ def selected_inputs(manifest, source_root, groups):
     return selected
 
 
+def copy_verified_input(entry, source, target):
+    """Copy and hash one input, rejecting size or checksum changes."""
+    digest = hashlib.sha256()
+    size = 0
+    with source.open('rb') as src, target.open('xb') as dst:
+        for block in iter(lambda: src.read(1024 * 1024), b''):
+            dst.write(block)
+            digest.update(block)
+            size += len(block)
+    actual = digest.hexdigest()
+    if size != entry['size_bytes'] or (entry.get('sha256') and actual != entry['sha256']):
+        raise ValueError('input changed or checksum mismatch: ' + entry['source'])
+    return size, actual
+
+
 def export(manifest, source_root, out, groups):
     if out.exists():
         raise FileExistsError('choose a new dataset directory: ' + str(out))
@@ -39,16 +54,7 @@ def export(manifest, source_root, out, groups):
     for entry, source in inputs:
         target = out / entry['path']
         target.parent.mkdir(parents=True, exist_ok=True)
-        digest = hashlib.sha256()
-        size = 0
-        with source.open('rb') as src, target.open('xb') as dst:
-            for block in iter(lambda: src.read(1024 * 1024), b''):
-                dst.write(block)
-                digest.update(block)
-                size += len(block)
-        actual = digest.hexdigest()
-        if size != entry['size_bytes'] or (entry.get('sha256') and actual != entry['sha256']):
-            raise ValueError('input changed or checksum mismatch: ' + entry['source'])
+        size, actual = copy_verified_input(entry, source, target)
         copied.append(dict(path=entry['path'], source=entry['source'], group=entry['group'],
                            size_bytes=size, sha256=actual))
         print('Copied ' + entry['path'], flush=True)
