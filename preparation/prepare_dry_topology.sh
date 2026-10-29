@@ -1,9 +1,9 @@
 #!/bin/bash
-# usage: bash dry_info.sh NAME
+# usage: bash preparation/prepare_dry_topology.sh NAME
 # Makes dry.NAME.prmtop and NAME.ntwprt (solute atom count for ntwprt). Use for WT too.
 set -e
 NAME=$1
-source "$(dirname "${BASH_SOURCE[0]}")/scripts/amber_env.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/../slurm/amber_env.sh"
 cpptraj > dry_$NAME.log << EOT
 parm $NAME.prmtop
 parmstrip :WAT,Na+,Cl-

@@ -143,7 +143,7 @@ def sensitivity_summary(project):
 
 
 def build(project, out, archive=None):
-    from report_pages import home, supplemental
+    from .report_pages import home, supplemental
     import shutil
 
     project = Path(project).resolve()

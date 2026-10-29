@@ -5,6 +5,10 @@ files and results were left unchanged. Sources below are relative to `Fc_FcR3`,
 not to a specific university filesystem. This account distinguishes evidence in
 current files from historical steps that cannot be established exactly.
 
+Historical filenames below describe the original study layout. Current commands use
+`preparation/extract_protein.py`, `preparation/mutate_protein.py`, and
+`preparation/build_complex.py`; see [the layout guide](REPOSITORY_LAYOUT.md).
+
 ## Authoritative inputs and provenance chain
 
 1. `prep/7URU.cif` and `7URU.cif` are byte-identical. The source structure has
@@ -23,8 +27,8 @@ current files from historical steps that cannot be established exactly.
    run only in a fresh directory with licensed preparation dependencies, is:
 
    ```bash
-   python make_p.py
-   python mutate.py protein_only.pdb --chain C --num 158 --aa VAL --radius 8 -o WT.pdb
+   python preparation/extract_protein.py
+   python preparation/mutate_protein.py protein_only.pdb --chain C --num 158 --aa VAL --radius 8 -o WT.pdb
    ```
 
    Radius 8 is an explicit reconstruction choice. Repacking is stochastic; use the
@@ -98,7 +102,7 @@ trajectories, particularly without original environments and packing seeds.
 
 ## Compile a self-contained dataset
 
-`scripts/export_inputs.py` materializes the manifest into a NEW directory, follows
+`slurm/export_inputs.py` materializes the manifest into a NEW directory, follows
 no unresolved parent-folder links in the output, checks known hashes, and computes
 all output hashes while copying (including trajectories). A successful export ends
 with `dataset-manifest.json`. Failure leaves a partial directory for inspection;
@@ -107,17 +111,17 @@ choose a new destination for the next attempt.
 For the analysis-only dataset, in a compute allocation:
 
 ```bash
-python scripts/export_inputs.py --source-root /path/to/Fc_FcR3 \
+python slurm/export_inputs.py --source-root /path/to/Fc_FcR3 \
   --out /path/to/new-dataset --groups analysis preparation
 ```
 
 To include actual prepared simulation inputs, add `simulation` to `--groups`.
-`scripts/export_inputs.slurm` provides the full-copy job template. Review it and
+`slurm/export_inputs.slurm` provides the full-copy job template. Review it and
 set exported `SOURCE_ROOT`/`DATASET_OUT` before any authorized submission.
 No export, trajectory hashing, or job submission was run on the login node.
 
 Configure the analysis against the resulting dataset root and its `WT.pdb` using
-`scripts/configure_protocol.py`. Remaining historical uncertainty is the precise
+`slurm/configure_protocol.py`. Remaining historical uncertainty is the precise
 protein mutation/repacking invocation and full software environment, not missing
 analysis files. A public dataset location, licensing, and experimental-label
 references still need owner decisions.

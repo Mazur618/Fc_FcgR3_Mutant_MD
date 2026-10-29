@@ -12,7 +12,7 @@ def main():
     parser.add_argument('--reference', type=Path, required=True)
     parser.add_argument('--out', type=Path, required=True)
     parser.add_argument('--template', type=Path,
-                        default=Path(__file__).resolve().parents[1] / 'analysis_v2/protocol.json')
+                        default=Path(__file__).resolve().parents[1] / 'config/analysis_protocol.json')
     args = parser.parse_args()
     cfg = json.loads(args.template.read_text())
     cfg['prep_root'] = os.path.relpath(args.data_root.resolve(), args.out.resolve().parent)

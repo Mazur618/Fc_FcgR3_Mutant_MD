@@ -11,9 +11,9 @@ import itertools
 import json
 from pathlib import Path
 
-from defined_analysis import digest, write_csv
-from plot_binding import load_energy
-from plot_defined import load_runs, METRIC_LABELS
+from .io import digest, write_csv
+from .plot_binding import load_energy
+from .plot_structure import load_runs, METRIC_LABELS
 
 
 STARTS = (301, 501, 701)

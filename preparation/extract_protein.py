@@ -1,4 +1,4 @@
-# make_protein.py
+# Extract the protein reference from the source CIF.
 import gemmi
 st = gemmi.read_structure('7URU.cif')
 st.remove_hydrogens()

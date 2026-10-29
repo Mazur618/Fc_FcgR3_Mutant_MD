@@ -6,8 +6,8 @@ import json
 from pathlib import Path
 import unittest
 
-from build_review import build, figure_catalog
-from test_defined_analysis import SharedFilesystemTemporaryDirectory
+from analysis.build_report import build, figure_catalog
+from test_analysis import SharedFilesystemTemporaryDirectory
 
 
 class Links(HTMLParser):

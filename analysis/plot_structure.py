@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compare completed analysis_v2 runs; never read trajectories or replace output.
+"""Compare completed analysis runs; never read trajectories or replace output.
 
 All supplied runs must share a protocol/reference and include every configured
 replicate. Interface plots use a union of pairs passing the display threshold in
@@ -11,7 +11,7 @@ import json
 import math
 from pathlib import Path
 
-from defined_analysis import write_csv
+from .io import write_csv
 
 
 METRIC_LABELS = {

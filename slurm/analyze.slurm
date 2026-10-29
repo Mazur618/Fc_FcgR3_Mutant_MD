@@ -22,5 +22,5 @@ runs = [(s, r) for s in cfg['systems'] for r in cfg['replicates']]
 print(*runs[int(sys.argv[2])])
 PYCODE
 )
-"$PY" analysis_v2/defined_analysis.py --protocol "$PROTOCOL" run \
+"$PY" -m analysis.trajectory --protocol "$PROTOCOL" run \
   --system "$SYSTEM" --replicate "$REP" --out "$OUTPUT_ROOT/$SYSTEM/rep$REP"

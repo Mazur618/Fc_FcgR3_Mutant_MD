@@ -18,7 +18,7 @@ not residue interaction energies.
 
 ## Fixed protocol
 
-`protocol.json` defines all systems, replicate identities, the reference, window,
+`config/analysis_protocol.json` defines all systems, replicate identities, the reference, window,
 cutoffs, and expected topology layout. Paths are relative to the protocol file.
 Every comparison requires the complete configured input set; missing runs cannot
 silently change the population being compared. For a deliberately smaller study,
@@ -88,17 +88,18 @@ equally. Uncertainty bars show between-replicate SD, not confidence intervals.
 From the repository root (the former `prep` folder), audit paths and mapping (lightweight, no trajectory reads):
 
 ```bash
-python analysis_v2/defined_analysis.py inventory --out analysis_v2/input_inventory.json
-python -B -m unittest discover -s analysis_v2 -p 'test_*.py' -v
+mkdir -p work
+python -m analysis.trajectory inventory --out work/input_inventory.json
+python -B -m unittest discover -s tests -p 'test_*.py' -v
 ```
 
 The trajectory command requires NumPy and MDAnalysis in an existing analysis
 environment. Run trajectory processing in a scheduler allocation, not on a shared login node.
-Limit numerical libraries to one thread; see `scripts/analyze.slurm`.
+Limit numerical libraries to one thread; see `slurm/analyze.slurm`.
 The Python command itself does not submit jobs:
 
 ```bash
-OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python analysis_v2/defined_analysis.py run --system WT --replicate 1 --out defined_results/WT/rep1
+OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python -m analysis.trajectory run --system WT --replicate 1 --out defined_results/WT/rep1
 ```
 
 Repeat for each configured system/replicate. The output directory must not
@@ -110,7 +111,7 @@ Once all runs are complete, produce tables and PNG/PDF figures (also requires
 Matplotlib):
 
 ```bash
-python analysis_v2/plot_defined.py defined_results/*/rep* --out defined_figures
+python -m analysis.plot_structure defined_results/*/rep* --out defined_figures
 ```
 
 No dependencies are installed automatically. Outputs refuse existing directories
@@ -125,7 +126,7 @@ separate direct-electrostatic/GB and net-component panels, and exploratory
 contact-count versus energy plots. Component bars show descriptive means.
 
 ```bash
-python analysis_v2/plot_binding.py defined_results/*/rep* --out defined_binding_figures
+python -m analysis.plot_binding defined_results/*/rep* --out defined_binding_figures
 ```
 
 Snapshot ordinals and counts are checked against structural results. Energy CSVs
@@ -146,7 +147,7 @@ conditions per interaction type and 36 per run, with 700/500/300 dense frames or
 140/100/60 coarse frames. Later windows are nested, not independent replicates.
 
 ```bash
-OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python analysis_v2/sensitivity.py defined_results/*/rep* --out sensitivity_results
+OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 python -m analysis.sensitivity defined_results/*/rep* --out sensitivity_results
 ```
 
 Each run must reproduce the primary pair counts exactly at the original settings.
@@ -165,7 +166,7 @@ resolve the limitations of short runs or fixed starting structures.
 ## Annotated offline image viewer
 
 ```bash
-python analysis_v2/build_review.py --out analysis_review --zip analysis_review.zip
+python -m analysis.build_report --out analysis_review --zip analysis_review.zip
 ```
 
 The report has two pages: `index.html` condenses structural summaries, selected

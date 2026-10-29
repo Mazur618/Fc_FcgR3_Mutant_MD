@@ -6,11 +6,11 @@ MDAnalysis and reads a single trajectory. Follow local analysis compute policies
 """
 import argparse
 from collections import Counter
-import csv
-import hashlib
 import json
 from pathlib import Path
 import platform
+
+from .io import digest, write_csv
 
 
 def read_protocol(path):
@@ -77,8 +77,6 @@ def residue_map(reference, cfg):
     return rows
 
 
-def digest(path):
-    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
 def input_records(protocol, cfg):
@@ -101,11 +99,6 @@ def input_records(protocol, cfg):
     return records
 
 
-def write_csv(path, fields, rows):
-    with Path(path).open('x', newline='') as fh:
-        writer = csv.DictWriter(fh, fieldnames=fields, extrasaction='ignore')
-        writer.writeheader()
-        writer.writerows(rows)
 
 
 def pair_counts(atom_pairs, left_residues, right_residues):
@@ -246,7 +239,7 @@ def run(protocol, cfg, system, replicate, out):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--protocol', type=Path, default=Path(__file__).with_name('protocol.json'))
+    parser.add_argument('--protocol', type=Path, default=Path(__file__).resolve().parents[1] / 'config/analysis_protocol.json')
     sub = parser.add_subparsers(dest='command', required=True)
     inventory = sub.add_parser('inventory', help='lightweight input audit; no trajectory reads')
     inventory.add_argument('--out', type=Path, required=True)

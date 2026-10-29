@@ -9,5 +9,5 @@
 set -euo pipefail
 : "${SOURCE_ROOT:?Set SOURCE_ROOT to the original Fc_FcR3 directory}"
 : "${DATASET_OUT:?Set DATASET_OUT to a new directory whose parent exists}"
-"${PY:-python}" scripts/export_inputs.py --source-root "$SOURCE_ROOT" \
+"${PY:-python}" slurm/export_inputs.py --source-root "$SOURCE_ROOT" \
   --out "$DATASET_OUT" --groups analysis preparation simulation

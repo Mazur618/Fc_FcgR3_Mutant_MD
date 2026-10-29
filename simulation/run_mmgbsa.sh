@@ -1,11 +1,11 @@
 #!/bin/bash
-# usage: bash post_variant.sh NAME REP   (submitted automatically after prod)
+# usage: bash simulation/run_mmgbsa.sh NAME REP   (submitted automatically after prod)
 # Image -> reorder atoms -> MM-GBSA topologies -> MMPBSA.py. Output: NAME/repN/FINAL.dat
 set -e
 NAME=$1; R=$2
 ROOT=$(pwd); D=$ROOT/$NAME/rep$R
 START=${START:-301}; INTERVAL=${INTERVAL:-5}   # stored frame 301 = 3.16 ns; same rule for every variant
-source "$ROOT/scripts/amber_env.sh"
+source "$ROOT/slurm/amber_env.sh"
 cp dry.$NAME.prmtop $D/dry.prmtop
 cd $D
 rm -f mm.dry.prmtop receptor.prmtop ligand.prmtop complex.prmtop cplx_nobox.prmtop

@@ -34,15 +34,15 @@ An external archive/access location remains a release decision.
 
 ## Configure paths
 
-Keep `analysis_v2/protocol.json` as the scientific template. Write a separate
+Keep `config/analysis_protocol.json` as the scientific template. Write a separate
 configured protocol, whose data/reference paths are relative to its own location:
 
 ```bash
 mkdir -p work
-python scripts/configure_protocol.py \
+python slurm/configure_protocol.py \
   --data-root /path/to/data-root --reference /path/to/WT.pdb \
   --out work/protocol.json
-python analysis_v2/defined_analysis.py --protocol work/protocol.json \
+python -m analysis.trajectory --protocol work/protocol.json \
   inventory --out work/inventory.json
 ```
 
@@ -55,7 +55,7 @@ always including WT. Do not silently omit missing runs from a comparison.
 ## Compute allocation
 
 Activate the analysis environment and set the numerical thread limits shown in
-the main README. Review `scripts/analyze.slurm`, adding your cluster's account
+the main README. Review `slurm/analyze.slurm`, adding your cluster's account
 and partition. It requests one CPU per task. Set exported `PROTOCOL` to the
 absolute configured protocol path and `OUTPUT_ROOT` to a new absolute output path.
 The default array 0–23 follows protocol system/replicate order; adjust its range
@@ -66,7 +66,7 @@ No setup command submits jobs.
 For one run inside an allocation:
 
 ```bash
-python analysis_v2/defined_analysis.py --protocol work/protocol.json run \
+python -m analysis.trajectory --protocol work/protocol.json run \
   --system WT --replicate 1 --out work/defined_results/WT/rep1
 ```
 
@@ -77,13 +77,13 @@ counts. Whole trajectories are not hashed by the analysis workflow.
 After all runs complete, use a suitable allocation for:
 
 ```bash
-python analysis_v2/plot_defined.py work/defined_results/*/rep* \
+python -m analysis.plot_structure work/defined_results/*/rep* \
   --out work/defined_figures_review
-python analysis_v2/plot_binding.py work/defined_results/*/rep* \
+python -m analysis.plot_binding work/defined_results/*/rep* \
   --out work/defined_binding_figures
-python analysis_v2/sensitivity.py work/defined_results/*/rep* \
+python -m analysis.sensitivity work/defined_results/*/rep* \
   --out work/sensitivity_results
-python analysis_v2/build_review.py --project work \
+python -m analysis.build_report --project work \
   --out work/analysis_review --zip work/analysis_review.zip
 ```
 
@@ -110,7 +110,7 @@ submission referenced version 24). These are separate from the analysis-only
 environment; no recovered preparation environment lock is supplied.
 Supply the original prepared VAL158 `WT.pdb` and glycan source `7URU.cif`.
 Their preparation history, edits, protonation, and checksums must accompany a
-released dataset. `build.py` does not create the receptor allotype by itself.
+released dataset. `preparation/build_complex.py` does not create the receptor allotype by itself.
 
 Load tools through your site environment, or export `AMBER_ENV` as the path to an
 Amber setup script. Leave it unset to use tools on PATH. GPU jobs need
@@ -121,7 +121,7 @@ your site and run preparation in an allocation.
 
 Build/postprocessing/submission scripts can overwrite generated outputs.
 Use a fresh working directory with copies of tracked source and supplied inputs;
-do not rerun them over existing results. `run_all.sh`, `submit_variant.sh`, and
+do not rerun them over existing results. `simulation/submit_all_variants.sh`, `simulation/submit_replicates.sh`, and
 `legacy/queue_analysis.sh` submit jobs and require explicit review/authorization.
 They have not been run during repository setup.
 

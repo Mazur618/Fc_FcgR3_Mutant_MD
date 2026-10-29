@@ -85,7 +85,7 @@ python3.10 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements-analysis.txt
 export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1
-python -B -m unittest discover -s analysis_v2 -p 'test_*.py' -v
+python -B -m unittest discover -s tests -p 'test_*.py' -v
 ```
 
 Alternatively, use `conda env create -f environment.yml` from the repository root.
@@ -95,7 +95,7 @@ analysis dependencies to exercise them. Scripts never install packages automatic
 
 See [the reproduction guide](docs/REPRODUCIBILITY.md) for required inputs, portable
 path configuration, scheduler use, and figure regeneration. See
-[analysis definitions](analysis_v2/README.md) for exact observables. Run trajectory
+[analysis definitions](analysis/README.md) for exact observables. Run trajectory
 processing, sensitivity calculations, and simulations in scheduler allocations,
 rather than on shared login nodes.
 
@@ -103,13 +103,14 @@ rather than on shared login nodes.
 
 | Path | Purpose |
 |---|---|
-| `analysis_v2/` | Current structural/contact analysis, comparisons, sensitivity, offline report, tests |
-| `analysis_v2/protocol.json` | Scientific settings and expected topology layout |
-| `scripts/` | Portable protocol writer, Amber environment helper, Slurm analysis template |
-| `templates/` | Amber minimization, heating, equilibration, production inputs |
-| `build.py`, `build_variant.sh`, `dry_info.sh` | System preparation |
-| `submit_variant.sh`, `post_variant.sh` | Site-configurable simulation submission and MM/GBSA |
-| `legacy/` | Archived exploration; definitions differ from `analysis_v2`; reference copies only |
+| `analysis/` | Current structural/contact analysis, comparisons, sensitivity, offline report |
+| `tests/` | Synthetic workflow, numerical, and report tests |
+| `config/analysis_protocol.json` | Scientific settings and expected topology layout |
+| `slurm/` | Portable protocol writer, Amber environment helper, Slurm analysis template |
+| `MD/` | Amber minimization, heating, equilibration, production inputs |
+| `preparation/` | Protein extraction/mutation, glycosylated complex construction, dry topology |
+| `simulation/` | Replicate submission and MM/GBSA postprocessing |
+| `legacy/` | Archived exploration; definitions differ from `analysis`; reference copies only |
 | `report/` | Selected two-page results report with figure/PDF/CSV assets |
 | `docs/` | Reproduction and release notes |
 
@@ -147,7 +148,6 @@ intended availability before force-adding any ignored files.
 This is a source scaffold for review, not an archived dataset release. See
 [release notes](docs/RELEASE.md) and [repository layout](docs/REPOSITORY_LAYOUT.md). A license must be chosen with the appropriate
 rights holders; no license is assigned here. Amber and PyRosetta have separate
-access/licensing requirements and are not redistributed. No remote or publication
-is configured by this setup.
+access/licensing requirements and are not redistributed. The source and curated report are published on GitHub; the raw dataset is separate.
 
 For repository creation and upload instructions, see [GitHub handoff](docs/GITHUB_SETUP.md).
